@@ -49,6 +49,7 @@ Build Complete
 - Editing shared semantics without prior `blast.py <node-id>`
 - Treating lookup/KG mappings as authoritative over raw artifacts
 - Landing a non-obvious change without a `// WHY:` (or language equivalent) marker
+- Merging a change with `python3 {PRODUCT_ROOT}/scripts/kg/risk.py` score ≥ 9 (critical band) without a `workstate.py decision --topic risk-acknowledgement` entry referenced from the PR
 - Bypassing application-runtime-container execution for compile/test/lint/security commands
 - Skipping any approval gate (code review at Step 4, security review at Step 6) or the signoff gate (Step 6.75)
 - Declaring done without the explicit Product Manager closeout at Step 6.9
@@ -964,6 +965,7 @@ Before Build Complete, verify required role signoffs across delivered features:
    - Run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` and resolve any errors before proceeding.
    - If the build introduced new canonical nodes or rationale entries, confirm they are present in `canonical-nodes.yaml`.
    - Regenerate and validate the symbol layer: `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols`. Editing a bound method body without first consulting `lookup.py --symbol` (or `hint.py --symbol`) is forbidden — the symbol-layer routing aid keeps edits narrow.
+   - Run `python3 {PRODUCT_ROOT}/scripts/kg/risk.py <node-id|--file|--symbol>` for the canonical nodes the build touched. For each node in the **high** band (`kg.risk` ≥ 7) confirm an additional reviewer is recorded on the PR; for each node in the **critical** band (`kg.risk` ≥ 9) confirm a `workstate.py decision --topic risk-acknowledgement` entry is referenced from the PR before merge. Weights/bands live in `agents/architect/references/risk-scoring-guide.md`.
 
 **Completion Criteria:**
 - [ ] Product Manager closeout executed after signoff passed
@@ -973,6 +975,7 @@ Before Build Complete, verify required role signoffs across delivered features:
 - [ ] Code-index bindings exist for new source files introduced during this build
 - [ ] `validate.py --check-drift` exits 0
 - [ ] `validate.py --regenerate-symbols --check-symbols` exits 0
+- [ ] `risk.py` run for touched canonical nodes; high-band PRs carry second-reviewer evidence and critical-band PRs reference a `workstate.py decision --topic risk-acknowledgement` entry
 
 ---
 

@@ -130,6 +130,7 @@ A product's lifecycle file must declare each gate with an explicit `command:` li
 - `{PRODUCT_ROOT}/scripts/kg/validate.py` (knowledge-graph sync; `--check-symbols` validates the symbol layer, `--check-decisions` validates the inline decision marker layer)
 - `{PRODUCT_ROOT}/scripts/kg/symbols.py` (symbol-index generator; invoked directly or via `validate.py --regenerate-symbols`)
 - `{PRODUCT_ROOT}/scripts/kg/decisions.py` (inline decision marker harvester; invoked directly or via `validate.py --regenerate-decisions`)
+- `{PRODUCT_ROOT}/scripts/kg/risk.py` (Phase 4 risk-score aggregator; combines blast/hotspot/cochange/ownership/test-gap into a 0–10 score per canonical node, file, or symbol — pre-flight gate, not authoritative)
 - `{PRODUCT_ROOT}/planning-mds/testing/validate-nebula-api-contract.py` (solution contract)
 - `{PRODUCT_ROOT}/planning-mds/testing/validate-frontend-quality-gate.py` (frontend quality)
 - Additional product-local equivalents for `api_contract`, `infra_strict`, `security_planning_strict` as each product matures

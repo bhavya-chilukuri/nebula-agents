@@ -106,3 +106,11 @@ content_assertions:
     skill: security
     must_contain: "hotspot files near auth or policy boundaries"
     rationale: Hotspot-driven targeted threat-model guidance added during KG Phase 3
+  - id: code_reviewer_risk_score_gate
+    skill: code-reviewer
+    must_contain: "Risk Score Gating"
+    rationale: Phase 4 risk-score reviewer gate (kg.risk >= 7 / >= 9) added during KG Phase 4
+  - id: architect_risk_release_readiness
+    skill: architect
+    must_contain: "scripts/kg/risk.py"
+    rationale: Phase 4 risk-score release-readiness review guidance added during KG Phase 4

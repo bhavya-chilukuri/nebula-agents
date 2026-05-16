@@ -274,6 +274,13 @@ Flag when you see:
 - Thresholds and customers/orders examples live in `agents/architect/references/hotspot-review-guide.md`.
 - Hotspot signals are decision aids, not authority — they never override raw artifact or design judgment.
 
+### 14. Risk Score Gating
+- For each canonical node the PR touches, run `python3 {PRODUCT_ROOT}/scripts/kg/risk.py <node-id>` (or `--file <changed-path>` / `--symbol <name>` for narrower scope) and record the score in the review notes.
+- If the score lands in the **high** band (`kg.risk` ≥ 7), require an additional reviewer beyond the PR author. Approving without that second reviewer is a **High** severity finding.
+- If the score lands in the **critical** band (`kg.risk` ≥ 9), require an explicit `python3 {PRODUCT_ROOT}/scripts/kg/workstate.py decision --topic risk-acknowledgement` entry referenced from the PR description before merge. Missing acknowledgement is a **High** severity finding.
+- Apply each `reviewer_recommendations[]` entry from `risk.py` as a checklist item — Phase 4 is a roll-up over the Phase 1–3 gates, not a replacement for them.
+- Weights, bands, and customers/orders examples live in `agents/architect/references/risk-scoring-guide.md`. Per `solution-ontology.yaml.authority.precedence`, the score never overrides raw artifact judgment.
+
 ## Review Workflow
 
 ### Step 1: Gather Context

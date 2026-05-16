@@ -156,6 +156,7 @@ Your responsibility is to define **HOW** to build what the Product Manager speci
    - When the session produced new code-index-worthy paths (e.g., new API contract files, schema files, architecture docs), add bindings in `code-index.yaml` so future agents can resolve those files to canonical nodes.
    - On feature close, harvest novel inline decision markers with `python3 {PRODUCT_ROOT}/scripts/kg/decisions.py`. Promote shared semantics into `canonical-nodes.yaml` rationale; leave local implementation reasoning inline.
    - At each release-readiness checkpoint, review canonical nodes flagged with `bus_factor_flag: true` in `coverage-report.yaml` and propose knowledge-share follow-ups (pair programming, deliberate co-authoring, doc passes, rotation). Thresholds and customers/orders examples live in `agents/architect/references/hotspot-review-guide.md`.
+   - At each release-readiness checkpoint, scan `python3 {PRODUCT_ROOT}/scripts/kg/risk.py` for canonical nodes in the **high** (`kg.risk` ≥ 7) or **critical** (`kg.risk` ≥ 9) bands and propose targeted mitigations (test backfill, refactor splits, knowledge-share follow-ups, or scope splits) before the next feature cycle. Weights and bands live in `agents/architect/references/risk-scoring-guide.md`.
 
 ## Capability Recommendation
 
