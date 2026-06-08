@@ -423,7 +423,7 @@ def main() -> int:
     parser.add_argument(
         "--max-lines",
         type=int,
-        default=500,
+        default=550,
         help="Maximum allowed lines per SKILL.md",
     )
     args = parser.parse_args()

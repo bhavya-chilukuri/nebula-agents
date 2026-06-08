@@ -18,7 +18,7 @@ when the full reference corpus is explicitly requested.
 
 ---
 
-## Architect (9,080 lines → ~700–1,000 per task)
+## Architect (expanded reference set → ~500–1,000 per task)
 
 | Task | References to Load |
 |------|--------------------|
@@ -30,6 +30,9 @@ when the full reference corpus is explicitly requested.
 | Security architecture review | `references/security-architecture-guide.md` |
 | Performance, scaling, caching | `references/performance-design-guide.md` |
 | Service boundaries, module design | `references/service-architecture-patterns.md` |
+| Microservice decomposition, service boundaries, DDD | `references/service-architecture-patterns.md` (Section 2) |
+| Deployment topology, Kubernetes, Helm, CI/CD | `references/microservices-deployment-patterns.md` |
+| Architecture decisions, ADRs, stack selection | `references/enterprise-architecture-decisions.md` |
 | AI/ML integration architecture | `references/ai-integration-patterns.md`, `references/ai-architecture-patterns.md` |
 | General architecture review, ADR | `references/architecture-best-practices.md` |
 | Architecture examples | `references/architecture-examples.md` |

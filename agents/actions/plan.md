@@ -50,12 +50,13 @@ Load in this order when the work is feature-scoped:
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
 4. `agents/actions/plan.md`
-5. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
-6. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
-7. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
-8. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml`
-9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml`
-10. `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**` when the feature folder exists
+5. `{PRODUCT_ROOT}/planning-mds/context-map.yaml` when present
+6. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
+7. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
+8. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
+9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml`
+10. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml`
+11. `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**` when the feature folder exists
 
 ## On-Demand Paths
 
@@ -63,6 +64,7 @@ Load in this order when the work is feature-scoped:
 - `{PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md`
 - `{PRODUCT_ROOT}/planning-mds/security/policies/policy.csv`
 - `{PRODUCT_ROOT}/planning-mds/knowledge-graph/*.yaml` beyond what `lookup.py` already returned
+- Product `planning-mds/context-map.yaml` on-demand layers only through the routing mode declared in that layer
 - `agents/<role>/references/**` only after a matching `agents/ROUTER.md` row
 
 ## Deliverables Contract
@@ -520,6 +522,36 @@ Before Phase A approval, synchronize and validate planning trackers:
 - `{PRODUCT_ROOT}/planning-mds/api/*.yaml` (OpenAPI contracts)
 - `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml` (completed feature/story bindings)
 - `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml` (when new shared semantics were introduced)
+
+---
+
+### Phase B.2: Microservices Architecture (if applicable)
+
+If the project warrants microservices and the decision is documented in an ADR, the Architect additionally produces:
+
+1. Context map (bounded contexts to services to stacks)
+2. Inter-service communication topology
+3. Event schema definitions (Avro/Protobuf and AsyncAPI where applicable)
+4. Saga designs for distributed workflows
+5. Resilience specifications per service dependency
+6. Deployment topology (Kubernetes namespaces, Helm structure, service mesh requirements)
+7. Observability architecture
+8. Data consistency strategy per bounded context
+
+**Output:**
+- `{PRODUCT_ROOT}/planning-mds/architecture/context-map.md`
+- `{PRODUCT_ROOT}/planning-mds/architecture/communication-topology.md`
+- `{PRODUCT_ROOT}/planning-mds/architecture/saga-designs.md`
+- `{PRODUCT_ROOT}/planning-mds/architecture/deployment-topology.md`
+- `{PRODUCT_ROOT}/planning-mds/architecture/observability.md`
+
+**Validation:**
+- [ ] ADR documents why microservices are justified over modular monolith
+- [ ] Every service has bounded context, owner, stack assignment, database ownership, and ADR reference
+- [ ] Every cross-service flow has sync/async communication pattern and contract format
+- [ ] Every multi-step distributed workflow has Saga steps, compensation, timeout, and idempotency strategy
+- [ ] Every synchronous dependency has timeout, retry/circuit breaker, and fallback policy
+- [ ] Observability and deployment topology are implementation-ready for DevOps and QE
 
 ---
 

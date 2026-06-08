@@ -58,6 +58,21 @@ Bypass ignored paths only for explicit audit, validation, closeout, failure
 triage, or user-requested inspection, and then read exact files rather than
 whole folders. Full semantics live in `agents/docs/AGENTIGNORE.md`.
 
+### Honoring `planning-mds/context-map.yaml`
+
+After checking `.agentignore`, check for
+`{PRODUCT_ROOT}/planning-mds/context-map.yaml`. This product-owned file is the
+local prompt-loading router. When it exists:
+
+- Load default layers only for the current action and target scope.
+- Resolve feature work through `REGISTRY.md`, `ROADMAP.md`, the target feature
+  folder, and KG lookup/hint output before opening raw source trees.
+- Route archives, evidence, full API/schema files, frontend/backend/neuron
+  source trees, tests, logs, screenshots, generated artifacts, and examples
+  through exact-file, KG, changed-path, manifest, or explicit-user routing.
+- Run the product validator when available, usually
+  `python3 {PRODUCT_ROOT}/scripts/validate-context-map.py`.
+
 ### What `{PRODUCT_ROOT}` prefixes
 
 Every reference from `agents/**` to product-owned paths uses the `{PRODUCT_ROOT}` placeholder. At baseline the placeholder prefixes all product-owned trees: `{PRODUCT_ROOT}/scripts/kg/...`, `{PRODUCT_ROOT}/planning-mds/...`, `{PRODUCT_ROOT}/engine/...`, `{PRODUCT_ROOT}/experience/...`, `{PRODUCT_ROOT}/neuron/...`, and `{PRODUCT_ROOT}/bruno/...`.
@@ -70,11 +85,16 @@ Examples:
 
 Framework-owned scripts stay framework-relative (no `{PRODUCT_ROOT}` prefix): `python3 agents/scripts/validate-genericness.py`, `python3 agents/scripts/run-lifecycle-gates.py`, `python3 agents/scripts/validate_templates.py`.
 
+Product repos that do not yet have a context map can start from
+`agents/templates/context-map-template.yaml` and adapt the layer paths to their
+local source, planning, schema, evidence, and generated-output layout.
+
 ### Discovering product-specific concretes
 
 Framework docs and templates do not hardcode product namespaces, API filenames, or entity names. The agent discovers these at session time from the product repo:
 
 - **Tech stack** → `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+- **Prompt context layers** → `{PRODUCT_ROOT}/planning-mds/context-map.yaml`, when present
 - **Entity-to-file bindings** → `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml` and `canonical-nodes.yaml`
 - **API spec location** → declared in `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`; agents do not assume a filename
 
@@ -214,6 +234,7 @@ Use these clauses when they apply:
 
 - `Before loading references, consult agents/ROUTER.md and load only the task-matched subset.`
 - `Before broad product discovery, load {PRODUCT_ROOT}/.agentignore if present and honor it as a gitignore-style agent retrieval guard.`
+- `If {PRODUCT_ROOT}/planning-mds/context-map.yaml exists, follow its default/on-demand layers before opening product files.`
 - `Before searching code, run python3 {PRODUCT_ROOT}/scripts/kg/hint.py <path> to get KG routing context.`
 - `If ontology coverage exists, load the matching knowledge-graph entry before reading raw files.`
 - `Use ontology mappings as compressed retrieval context only; source artifacts win on conflict.`
