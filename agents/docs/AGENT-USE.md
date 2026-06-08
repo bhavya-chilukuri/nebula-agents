@@ -58,6 +58,17 @@ Bypass ignored paths only for explicit audit, validation, closeout, failure
 triage, or user-requested inspection, and then read exact files rather than
 whole folders. Full semantics live in `agents/docs/AGENTIGNORE.md`.
 
+### Honoring `planning-mds/context-map.yaml`
+
+After `.agentignore`, check for `{PRODUCT_ROOT}/planning-mds/context-map.yaml`.
+When present, use it as the product-local prompt-loading strategy: load default
+layers first, prefer target feature files, KG lookup/hint output, and exact
+changed files, and treat archives, historical evidence, full source trees,
+full specs/schemas, screenshots, logs, and generated artifacts as on-demand.
+Exact-file access remains allowed for audit, validation, closeout, failure
+triage, security review, changed-path routing, KG routing, exact contract
+checks, and explicit user requests. See `agents/docs/PRODUCT-CONTEXT-MAP.md`.
+
 ### What `{PRODUCT_ROOT}` prefixes
 
 Every reference from `agents/**` to product-owned paths uses the `{PRODUCT_ROOT}` placeholder. At baseline the placeholder prefixes all product-owned trees: `{PRODUCT_ROOT}/scripts/kg/...`, `{PRODUCT_ROOT}/planning-mds/...`, `{PRODUCT_ROOT}/engine/...`, `{PRODUCT_ROOT}/experience/...`, `{PRODUCT_ROOT}/neuron/...`, and `{PRODUCT_ROOT}/bruno/...`.
