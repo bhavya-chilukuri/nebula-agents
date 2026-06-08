@@ -87,6 +87,27 @@ public class OrderService
 }
 ```
 
+```python
+# Python: Module/service interface using Protocol
+from typing import Protocol
+from uuid import UUID
+
+class CustomerService(Protocol):
+    """Order module depends on Customer module through this protocol."""
+    async def get_by_id(self, customer_id: UUID) -> "Customer | None": ...
+    async def is_active(self, customer_id: UUID) -> bool: ...
+
+class OrderService:
+    def __init__(self, customer_service: CustomerService):
+        self._customers = customer_service
+
+    async def create(self, request: "CreateOrderRequest") -> "Order":
+        if not await self._customers.is_active(request.customer_id):
+            raise ValueError("Customer not found or inactive")
+
+        # ... create order
+```
+
 **Benefits:**
 - Clear module boundaries
 - Testable (can mock interfaces)
@@ -123,6 +144,55 @@ App.SharedKernel/
       └── IRepository.cs
 ```
 
+**Python Shared Kernel:**
+
+```python
+# shared/base_entity.py
+from dataclasses import dataclass, field
+from datetime import datetime
+from uuid import UUID, uuid4
+
+@dataclass
+class BaseEntity:
+    id: UUID = field(default_factory=uuid4)
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    updated_at: datetime | None = None
+    version: int = 0
+```
+
+```python
+# shared/result.py
+from dataclasses import dataclass
+from typing import Generic, TypeVar
+
+T = TypeVar("T")
+
+@dataclass(frozen=True)
+class Result(Generic[T]):
+    value: T | None = None
+    error: str | None = None
+    is_success: bool = True
+```
+
+```python
+# shared/value_objects.py
+from dataclasses import dataclass
+from decimal import Decimal
+
+@dataclass(frozen=True)
+class Money:
+    amount: Decimal
+    currency: str = "USD"
+
+@dataclass(frozen=True)
+class EmailAddress:
+    value: str
+
+    def __post_init__(self):
+        if "@" not in self.value:
+            raise ValueError(f"Invalid email: {self.value}")
+```
+
 ---
 
 ### 1.5 Benefits of Modular Monolith
@@ -148,7 +218,320 @@ App.SharedKernel/
 
 ---
 
-## 2. Clean Architecture Layers
+## 2. Enterprise Microservices Architecture
+
+Use microservices only when the architecture needs independent deployment, independent scaling, team autonomy, or genuinely different persistence/runtime needs. A modular monolith with strict module boundaries is the default until those forces are proven in an ADR.
+
+### 2.1 Transition Criteria
+
+Move from modular monolith to microservices when most of these are true:
+
+| Criterion | Evidence Required |
+|-----------|-------------------|
+| Independent deployment | One bounded context changes often and blocks unrelated releases |
+| Independent scaling | One bounded context has materially different traffic or compute profile |
+| Data ownership | A module needs isolated persistence, retention, or storage technology |
+| Team autonomy | Teams can own service operations, deployments, incidents, and contracts |
+| Integration maturity | Contract tests, tracing, CI/CD, and observability already exist |
+
+Do not split for preference alone. If a team cannot operate the service lifecycle, keep the boundary in-process and document it as an extraction candidate.
+
+### 2.2 Service Decomposition with DDD
+
+Start with event storming or domain analysis. Identify bounded contexts, name the business capability each owns, and map one coarse service per bounded context. Split further only when scaling or release cadence justifies it.
+
+```markdown
+## Context Map
+
+| Bounded Context | Service | Stack | Relationship |
+|-----------------|---------|-------|--------------|
+| Customers | customer-service | .NET | Upstream, publishes CustomerCreated |
+| Orders | order-service | Python | Downstream, consumes CustomerCreated |
+| Products | product-service | .NET | Upstream, publishes ProductChanged |
+
+### Integration Patterns
+- Customers -> Orders: Anti-corruption layer; order-service translates customer events to its own model.
+- Products -> Orders: Published language; shared Avro schema in schema registry.
+- Orders -> Customers: REST query only for user-facing read paths that require current customer status.
+```
+
+### 2.3 Inter-Service Communication
+
+| Pattern | Use When | Python | .NET |
+|---------|----------|--------|------|
+| REST | Public APIs and simple external consumers | FastAPI | ASP.NET Core Minimal APIs |
+| gRPC | Internal synchronous query or streaming | grpcio | Grpc.AspNetCore |
+| Domain events | Cross-service side effects and eventual consistency | confluent-kafka | Confluent.Kafka |
+| Command queue | Task distribution or request/reply async | aio-pika | MassTransit |
+| Real-time UI | Browser push notifications | FastAPI WebSocket | SignalR |
+
+```python
+# Python REST endpoint
+from fastapi import APIRouter
+
+router = APIRouter(prefix="/api/v1/orders")
+
+@router.get("/{order_id}")
+async def get_order(order_id: str) -> dict:
+    return await order_queries.get_order(order_id)
+```
+
+```csharp
+// .NET REST endpoint
+app.MapGet("/api/v1/orders/{orderId}", async (
+    Guid orderId,
+    GetOrderQuery query) =>
+{
+    var order = await query.ExecuteAsync(orderId);
+    return order is null ? Results.NotFound() : Results.Ok(order);
+});
+```
+
+```python
+# Python Kafka producer
+from confluent_kafka import Producer
+import json
+
+producer = Producer({"bootstrap.servers": settings.kafka_bootstrap})
+producer.produce(
+    "events.orders",
+    key=str(order.id),
+    value=json.dumps({"eventType": "OrderCreated", "orderId": str(order.id)}),
+)
+producer.flush()
+```
+
+```csharp
+// .NET Kafka producer
+var message = new Message<string, string>
+{
+    Key = order.Id.ToString(),
+    Value = JsonSerializer.Serialize(new { eventType = "OrderCreated", orderId = order.Id })
+};
+await producer.ProduceAsync("events.orders", message);
+```
+
+### 2.4 Transactional Outbox
+
+Never publish events directly inside the same code path as a database mutation without an outbox. Persist the aggregate change and event record in one local transaction; a relay publishes later.
+
+```python
+# Python SQLAlchemy outbox write
+async with session.begin():
+    session.add(order)
+    session.add(OutboxMessage(
+        topic="events.orders",
+        aggregate_id=str(order.id),
+        event_type="OrderCreated",
+        payload=event_payload,
+    ))
+```
+
+```csharp
+// .NET EF Core outbox write
+await using var tx = await db.Database.BeginTransactionAsync();
+db.Orders.Add(order);
+db.OutboxMessages.Add(new OutboxMessage
+{
+    Topic = "events.orders",
+    AggregateId = order.Id,
+    EventType = "OrderCreated",
+    Payload = JsonSerializer.Serialize(payload)
+});
+await db.SaveChangesAsync();
+await tx.CommitAsync();
+```
+
+### 2.5 Saga Orchestration
+
+Use Saga orchestration for workflows that span services, require compensation, or are long-running. Prefer Temporal.io when there are more than three steps or explicit compensation rules.
+
+```python
+# Python Temporal workflow sketch
+@workflow.defn
+class OrderFulfillmentWorkflow:
+    @workflow.run
+    async def run(self, command: FulfillOrder) -> None:
+        await workflow.execute_activity(reserve_inventory, command.order_id)
+        try:
+            await workflow.execute_activity(charge_payment, command.order_id)
+            await workflow.execute_activity(create_shipment, command.order_id)
+        except Exception:
+            await workflow.execute_activity(release_inventory, command.order_id)
+            raise
+```
+
+```csharp
+// .NET Temporal workflow sketch
+[Workflow]
+public class OrderFulfillmentWorkflow
+{
+    [WorkflowRun]
+    public async Task RunAsync(FulfillOrder command)
+    {
+        await Workflow.ExecuteActivityAsync(() => Activities.ReserveInventory(command.OrderId));
+        try
+        {
+            await Workflow.ExecuteActivityAsync(() => Activities.ChargePayment(command.OrderId));
+            await Workflow.ExecuteActivityAsync(() => Activities.CreateShipment(command.OrderId));
+        }
+        catch
+        {
+            await Workflow.ExecuteActivityAsync(() => Activities.ReleaseInventory(command.OrderId));
+            throw;
+        }
+    }
+}
+```
+
+### 2.6 CQRS and Event Sourcing
+
+Use CQRS when read and write shapes diverge or read models need independent scaling. Use event sourcing only for aggregates with complex state transitions, full audit requirements, temporal queries, or high replay value.
+
+```python
+# Python event-sourced aggregate sketch
+class OrderAggregate:
+    def apply(self, event: dict) -> None:
+        if event["type"] == "OrderCreated":
+            self.id = event["orderId"]
+            self.status = "created"
+```
+
+```csharp
+// .NET event-sourced aggregate sketch
+public void Apply(OrderCreated @event)
+{
+    Id = @event.OrderId;
+    Status = "created";
+}
+```
+
+### 2.7 API Gateway Pattern
+
+The gateway handles cross-cutting ingress behavior; services still enforce authorization and invariants.
+
+```yaml
+api_gateway:
+  provider: kong
+  responsibilities:
+    - jwt_validation
+    - rate_limiting
+    - request_routing
+    - ssl_termination
+    - api_versioning
+    - cors
+    - request_id_injection
+  routes:
+    - path: /api/v1/orders/**
+      service: order-service
+      rate_limit: 100/min
+    - path: /api/v1/customers/**
+      service: customer-service
+      rate_limit: 200/min
+```
+
+### 2.8 Database Per Service
+
+Each service owns its database. Other services access data through APIs, events, or read projections. Shared databases and cross-service joins are forbidden.
+
+| Need | Pattern |
+|------|---------|
+| Local mutation | Service-owned ACID transaction |
+| Cross-service state change | Domain event plus outbox |
+| Cross-service compensation | Saga |
+| Read model spanning services | Async projection |
+
+### 2.9 Resilience Patterns
+
+Specify resilience per dependency, not as a blanket default.
+
+```python
+# Python retry with tenacity
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.5))
+async def fetch_customer(customer_id: str) -> CustomerSnapshot:
+    return await customer_client.get(customer_id, timeout=5)
+```
+
+```csharp
+// .NET retry/circuit breaker with Polly
+builder.Services.AddHttpClient<CustomerClient>()
+    .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(5)))
+    .AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(
+        3,
+        attempt => TimeSpan.FromMilliseconds(500 * Math.Pow(2, attempt))))
+    .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+```
+
+### 2.10 Observability Architecture
+
+Every service emits traces, metrics, and structured logs with consistent correlation.
+
+```python
+# Python OpenTelemetry sketch
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+FastAPIInstrumentor.instrument_app(app)
+```
+
+```csharp
+// .NET OpenTelemetry sketch
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddOtlpExporter())
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation()
+        .AddPrometheusExporter());
+```
+
+### 2.11 Security
+
+- Use mTLS for service-to-service traffic through a service mesh when running on Kubernetes.
+- Validate JWTs at the gateway and inside services for defense in depth.
+- Use ABAC/RBAC policies per service; never rely on another service's authorization decision for local mutations.
+- Sign or validate event provenance for high-trust workflows.
+- Keep secrets in external secret management, not application configuration files.
+
+### 2.12 12-Factor Compliance
+
+| Factor | Python | .NET |
+|--------|--------|------|
+| Config | Pydantic settings from env | Options pattern from env |
+| Dependencies | pyproject/lockfile | csproj/NuGet lockfile |
+| Logs | JSON logs to stdout | Serilog JSON to stdout |
+| Processes | uvicorn/gunicorn worker | ASP.NET Core process |
+| Port binding | ASGI server port | Kestrel port |
+
+### 2.13 Polyglot Directory Structure
+
+```text
+services/
+  order-service/
+    pyproject.toml
+    app/
+      domain/
+      application/
+      infrastructure/
+      api/
+  customer-service/
+    CustomerService.csproj
+    Domain/
+    Application/
+    Infrastructure/
+    Api/
+contracts/
+  openapi/
+  asyncapi/
+  protobuf/
+  avro/
+deploy/
+  helm/
+  kustomize/
+```
+
+---
+
+## 3. Clean Architecture Layers
 
 ### 2.1 Overview
 
@@ -370,7 +753,7 @@ Infrastructure Layer
 
 ---
 
-## 3. Domain-Driven Design Patterns
+## 4. Domain-Driven Design Patterns
 
 ### 3.1 Aggregates
 
@@ -585,7 +968,7 @@ public class PricingCalculationService
 
 ---
 
-## 4. CQRS Considerations
+## 5. CQRS Considerations
 
 ### 4.1 What is CQRS?
 
@@ -666,7 +1049,7 @@ var customers = await context.Customers
 
 ---
 
-## 5. Integration Patterns
+## 6. Integration Patterns
 
 ### 5.1 Temporal Workflow Integration
 

@@ -1,0 +1,164 @@
+version: 1
+purpose: >
+  Product-local prompt context strategy. Agents use this map to minimize
+  default context and route large or historical surfaces through exact-file,
+  knowledge-graph, changed-path, manifest, or explicit-user requests.
+
+defaults:
+  load_order:
+    - product_core
+    - feature_scope
+    - knowledge_graph_scope
+  max_default_strategy: indexes_and_target_only
+  exact_file_access_allowed: true
+  broad_search_policy: honor_agentignore
+
+routing_modes:
+  exact_file: Read a specific file path named by task, manifest, KG output, or user.
+  target_feature: Read only the selected planning-mds/features/F####-* folder.
+  kg_lookup: Use product KG lookup/hint/blast/code-index bindings first.
+  changed_path: Use git diff/status, KG hint output, or explicit changed files.
+  manifest: Use evidence manifest/latest-run/artifact trace to select evidence files.
+  explicit_user: User explicitly requested the path, artifact, screenshot, log, or archive.
+
+layers:
+  product_core:
+    default_context:
+      - README.md
+      - lifecycle-stage.yaml
+      - .agentignore
+      - planning-mds/features/REGISTRY.md
+      - planning-mds/features/ROADMAP.md
+    on_demand_context:
+      - planning-mds/BLUEPRINT.md
+      - planning-mds/domain/**
+      - planning-mds/security/**
+    routing_required: [exact_file, explicit_user]
+
+  feature_scope:
+    target_scoped: true
+    default_context:
+      - planning-mds/features/REGISTRY.md
+      - planning-mds/features/ROADMAP.md
+    target_context_template:
+      - planning-mds/features/F####-*/README.md
+      - planning-mds/features/F####-*/*.md
+      - planning-mds/features/F####-*/feature-assembly-plan.md
+    on_demand_context:
+      - planning-mds/features/F####-*/**
+    forbidden_default_context:
+      - planning-mds/features/**
+      - planning-mds/features/archive/**
+    routing_required: [target_feature, kg_lookup, explicit_user]
+
+  architecture_scope:
+    default_context: []
+    on_demand_context:
+      - planning-mds/architecture/**
+    routing_required: [exact_file, kg_lookup, explicit_user]
+
+  knowledge_graph_scope:
+    default_context:
+      - scripts/kg/lookup.py output for the target feature when available
+      - scripts/kg/hint.py output for changed paths when available
+    on_demand_context:
+      - planning-mds/knowledge-graph/**
+    routing_required: [kg_lookup, exact_file, explicit_user]
+
+  api_schema_scope:
+    default_context: []
+    on_demand_context:
+      - planning-mds/api/**
+      - planning-mds/schemas/**
+      - planning-mds/lob-schemas/**
+    routing_required: [exact_file, kg_lookup, changed_path, explicit_user]
+
+  frontend_scope:
+    default_context: []
+    on_demand_context:
+      - experience/src/**
+      - experience/tests/**
+      - experience/package.json
+      - experience/*config*
+    forbidden_default_context:
+      - experience/**
+      - experience/src/**
+      - experience/node_modules/**
+      - experience/dist/**
+      - experience/test-results/**
+      - experience/playwright-report/**
+      - experience/coverage/**
+    routing_required: [changed_path, kg_lookup, exact_file, explicit_user]
+
+  backend_scope:
+    default_context: []
+    on_demand_context:
+      - engine/src/**
+      - engine/tests/**
+      - engine/*.slnx
+      - engine/**/*.csproj
+    forbidden_default_context:
+      - engine/**
+      - engine/src/**
+      - engine/tests/**
+      - engine/**/bin/**
+      - engine/**/obj/**
+    routing_required: [changed_path, kg_lookup, exact_file, explicit_user]
+
+  neuron_scope:
+    default_context: []
+    on_demand_context:
+      - neuron/**
+    forbidden_default_context:
+      - neuron/**
+    routing_required: [changed_path, kg_lookup, exact_file, explicit_user]
+
+  evidence_scope:
+    default_context:
+      - planning-mds/operations/evidence/README.md
+      - planning-mds/operations/evidence/features/**/latest-run.json
+    on_demand_context:
+      - planning-mds/operations/evidence/**
+    forbidden_default_context:
+      - planning-mds/operations/evidence/**
+      - planning-mds/operations/evidence/runs/**
+      - planning-mds/operations/evidence/**/artifacts/**
+      - planning-mds/operations/evidence/**/*.log
+      - planning-mds/operations/evidence/**/*.png
+      - planning-mds/operations/evidence/**/*.jpg
+      - planning-mds/operations/evidence/**/*.jpeg
+    routing_required: [manifest, exact_file, explicit_user]
+
+  archive_scope:
+    default_context: []
+    on_demand_context:
+      - planning-mds/features/archive/**
+    forbidden_default_context:
+      - planning-mds/features/archive/**
+    routing_required: [exact_file, explicit_user, kg_lookup]
+
+  output_format:
+    default_context: []
+    on_demand_context:
+      - planning-mds/features/TRACKER-GOVERNANCE.md
+      - planning-mds/features/STORY-INDEX.md
+      - planning-mds/operations/evidence/README.md
+      - planning-mds/testing/**
+    routing_required: [exact_file, explicit_user]
+
+  examples:
+    default_context: []
+    on_demand_context:
+      - planning-mds/examples/**
+      - planning-mds/screens/**
+      - planning-mds/features/archive/**
+    forbidden_default_context:
+      - planning-mds/examples/**
+      - planning-mds/screens/**
+      - planning-mds/**/*.png
+      - planning-mds/**/*.jpg
+      - planning-mds/**/*.jpeg
+      - planning-mds/**/*.gif
+      - planning-mds/**/*.webp
+      - planning-mds/**/*.pdf
+    routing_required: [exact_file, explicit_user]

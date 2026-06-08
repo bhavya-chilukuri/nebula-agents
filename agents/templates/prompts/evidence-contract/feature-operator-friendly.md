@@ -40,10 +40,11 @@ Load context in this order and navigate instead of eager-loading:
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
 4. `agents/actions/feature.md`
-5. `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} --run-id {RUN_ID} --telemetry-file {PRODUCT_ROOT}/.kg-state/telemetry.jsonl`
-6. `{FEATURE_PATH}/**` — `PRIMARY_SPEC` is required reading once it exists; on a clean first run it is authored in G0 Step 0 before any slice work
+5. `{PRODUCT_ROOT}/planning-mds/context-map.yaml` when present
+6. `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} --run-id {RUN_ID} --telemetry-file {PRODUCT_ROOT}/.kg-state/telemetry.jsonl`
+7. `{FEATURE_PATH}/**` — `PRIMARY_SPEC` is required reading once it exists; on a clean first run it is authored in G0 Step 0 before any slice work
 
-Treat `lookup.py` as a FIRST-PASS scope resolver only. Raw artifacts win on conflict. Open these only when lookup links them, the current gate needs them, or drift repair requires them: `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`, `{PRODUCT_ROOT}/planning-mds/api/<openapi-spec>.yaml`, `{PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md`, `{PRODUCT_ROOT}/planning-mds/security/policies/policy.csv`, `{PRODUCT_ROOT}/planning-mds/knowledge-graph/*.yaml` beyond the already returned subset, and `agents/<role>/references/**` only with a `ROUTER.md` row match.
+Treat `lookup.py` as a FIRST-PASS scope resolver only. Raw artifacts win on conflict. Open these only when lookup links them, the current gate needs them, drift repair requires them, or the product context-map routing mode allows them: `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`, `{PRODUCT_ROOT}/planning-mds/api/<openapi-spec>.yaml`, `{PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md`, `{PRODUCT_ROOT}/planning-mds/security/policies/policy.csv`, `{PRODUCT_ROOT}/planning-mds/knowledge-graph/*.yaml` beyond the already returned subset, context-map on-demand layers, and `agents/<role>/references/**` only with a `ROUTER.md` row match.
 
 Use these commands and keep them verbatim:
 - `python3 {PRODUCT_ROOT}/scripts/kg/workstate.py --state-file {PRODUCT_ROOT}/.kg-state/{FEATURE_ID}-feature.yaml init --role feature --scope {FEATURE_ID} --run-id {RUN_ID} --mode {MODE}`

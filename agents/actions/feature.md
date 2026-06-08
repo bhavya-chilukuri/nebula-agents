@@ -57,13 +57,14 @@ Load in this order when the work is feature-scoped:
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
 4. `agents/actions/feature.md`
-5. `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` (the Primary Spec — authored in G0 Step 0 of this action; read once it exists, not a precondition)
-6. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
-7. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
-8. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
-9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml`
-10. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml`
-11. `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**`
+5. `{PRODUCT_ROOT}/planning-mds/context-map.yaml` when present
+6. `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` (the Primary Spec — authored in G0 Step 0 of this action; read once it exists, not a precondition)
+7. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
+8. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
+9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
+10. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml`
+11. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml`
+12. `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**`
 
 ## On-Demand Paths
 
@@ -71,6 +72,7 @@ Load in this order when the work is feature-scoped:
 - `{PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md`
 - `{PRODUCT_ROOT}/planning-mds/security/policies/policy.csv`
 - `{PRODUCT_ROOT}/planning-mds/knowledge-graph/*.yaml` beyond what `lookup.py` already returned
+- Product `planning-mds/context-map.yaml` on-demand layers only through the routing mode declared in that layer
 - `agents/<role>/references/**` only after a matching `agents/ROUTER.md` row
 
 ## Primary Spec

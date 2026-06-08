@@ -22,7 +22,7 @@ proved the tests passed?", "who signed off, and on what evidence?", or
 Agent Ops is that record. Each run writes a structured **evidence
 package**: a manifest, role/gate reports, an append-only command log, and
 a lifecycle-gate log. The package is the contract surface — gate decisions
-must be backed by recorded evidence, not by prose claims. A validator reads
+must be backed by recorded evidence, not by prose assertions. A validator reads
 the package at every stage so gaps are caught *during* the run, not at
 closeout.
 
@@ -254,7 +254,7 @@ When `security_sensitive_scope = true` **and** the run's
 `contract_effective_date >= 2026-05-25`, the validator requires all four
 classes to be backed-or-waived. A scanner that is unavailable is recorded as a
 waiver (never silently skipped). Rules: `security_scans_missing_fails`,
-`security_scan_class_missing_fails`, `security_scan_unbacked_fails` (claimed
+`security_scan_class_missing_fails`, `security_scan_unbacked_fails` (asserted
 `ran` with no resolvable artifact), `security_scan_unwaived_skip_fails` (did not
 run, no complete waiver). Runs on earlier contract dates are exempt.
 

@@ -38,17 +38,18 @@ Load context in this order:
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
 4. `agents/actions/plan.md`
-5. `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (confirm `FEATURE_ID` is reserved or new)
-6. `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
-7. `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
-8. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
-9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
-10. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
-11. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml`
-12. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml`
-13. `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**` when the feature folder exists
+5. `{PRODUCT_ROOT}/planning-mds/context-map.yaml` when present
+6. `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (confirm `FEATURE_ID` is reserved or new)
+7. `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
+8. `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (on-demand when context-map marks it on-demand)
+9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
+10. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
+11. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
+12. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml`
+13. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml`
+14. `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**` when the feature folder exists
 
-Open these on demand only when lookup links them, the current gate needs them, or drift repair requires them: `{PRODUCT_ROOT}/planning-mds/api/<openapi-spec>.yaml`, `{PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md`, `{PRODUCT_ROOT}/planning-mds/security/policies/policy.csv`, and `agents/<role>/references/**` only with a `ROUTER.md` row match.
+Open these on demand only when lookup links them, the current gate needs them, drift repair requires them, or the product context-map routing mode allows them: `{PRODUCT_ROOT}/planning-mds/api/<openapi-spec>.yaml`, `{PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md`, `{PRODUCT_ROOT}/planning-mds/security/policies/policy.csv`, context-map on-demand layers, and `agents/<role>/references/**` only with a `ROUTER.md` row match.
 
 Don't generate `{PLAN_RUN_ID}` with `uuid4` or any non-contract format. Don't write or consume `current-run.json`. Don't produce role reports (`g0-*`, `test-*`, `code-review-*`, etc.) — those belong to the feature action's evidence package at `agents/actions/feature.md`, not the plan action. Don't create a feature evidence package at `{FEATURE_INDEX_ROOT}/` during plan; that root is created later by `feature.md`. Don't skip the approval or ontology-sync gates. Don't edit `canonical-nodes.yaml` or `solution-ontology.yaml` outside the Architect phase. Don't treat lookup/KG mappings as authoritative over raw artifacts. Don't climb past max_auto_tier without recording a workstate.py escalate event.
 

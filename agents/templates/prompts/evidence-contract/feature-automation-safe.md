@@ -67,9 +67,10 @@ CONTEXT LOADING ORDER (navigate; do not eager-load):
 2. agents/agent-map.yaml
 3. agents/docs/AGENT-USE.md
 4. agents/actions/feature.md
-5. `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} --run-id {RUN_ID} --telemetry-file {PRODUCT_ROOT}/.kg-state/telemetry.jsonl`
+5. {PRODUCT_ROOT}/planning-mds/context-map.yaml when present
+6. `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} --run-id {RUN_ID} --telemetry-file {PRODUCT_ROOT}/.kg-state/telemetry.jsonl`
    — FIRST-PASS scope resolver; raw artifacts win on conflict.
-6. {FEATURE_PATH}/**   (PRIMARY_SPEC is required reading once it exists; on a clean first run it is authored in G0 Step 0 before slice work)
+7. {FEATURE_PATH}/**   (PRIMARY_SPEC is required reading once it exists; on a clean first run it is authored in G0 Step 0 before slice work)
 
 ON-DEMAND (only if linked by lookup, required by current gate, or required by drift repair):
 - {PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml
@@ -77,6 +78,7 @@ ON-DEMAND (only if linked by lookup, required by current gate, or required by dr
 - {PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md
 - {PRODUCT_ROOT}/planning-mds/security/policies/policy.csv
 - {PRODUCT_ROOT}/planning-mds/knowledge-graph/*.yaml beyond what lookup output already covers
+- Product context-map on-demand layers only through the routing mode declared in that layer
 - agents/<role>/references/** — only with a ROUTER.md row match
 
 FORBIDDEN:

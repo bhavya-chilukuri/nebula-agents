@@ -80,5 +80,5 @@ EXIT VALIDATION:
 - Confirm gate-decisions.md records all B0..B5 (or B0..B4 if AMPLIFICATION=none)
 
 CONFLICT RESOLUTION:
-- blog claim disagrees with REGISTRY.md/STATUS.md/pm-closeout.md → registry/closeout wins; fix the post
-- blog claim disagrees with code → code wins; do not publish content that misleads
+- blog statement disagrees with REGISTRY.md/STATUS.md/pm-closeout.md → registry/closeout wins; fix the post
+- blog statement disagrees with code → code wins; do not publish content that misleads

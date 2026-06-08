@@ -50,20 +50,22 @@ CONTEXT LOADING ORDER:
 2. agents/agent-map.yaml
 3. agents/docs/AGENT-USE.md
 4. agents/actions/plan.md
-5. {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md (confirm FEATURE_ID is reserved or new)
-6. {PRODUCT_ROOT}/planning-mds/features/ROADMAP.md
-7. {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md (domain context)
-8. {PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml (architectural context)
-9. {PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml
-10. {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml
-11. {PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml
-12. {PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml
-13. {PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/** when the feature folder exists
+5. {PRODUCT_ROOT}/planning-mds/context-map.yaml when present
+6. {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md (confirm FEATURE_ID is reserved or new)
+7. {PRODUCT_ROOT}/planning-mds/features/ROADMAP.md
+8. {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md (domain context; on-demand when context-map marks it on-demand)
+9. {PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml (architectural context)
+10. {PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml
+11. {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml
+12. {PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml
+13. {PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml
+14. {PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/** when the feature folder exists
 
 ON-DEMAND PATHS (only when linked by lookup, required by the current gate, or required by drift repair):
 - {PRODUCT_ROOT}/planning-mds/api/<openapi-spec>.yaml
 - {PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md
 - {PRODUCT_ROOT}/planning-mds/security/policies/policy.csv
+- Product context-map on-demand layers only through the routing mode declared in that layer
 - agents/<role>/references/** only after a matching agents/ROUTER.md row
 
 FORBIDDEN:

@@ -81,11 +81,16 @@ Examples:
 
 Framework-owned scripts stay framework-relative (no `{PRODUCT_ROOT}` prefix): `python3 agents/scripts/validate-genericness.py`, `python3 agents/scripts/run-lifecycle-gates.py`, `python3 agents/scripts/validate_templates.py`.
 
+Product repos that do not yet have a context map can start from
+`agents/templates/context-map-template.yaml` and adapt the layer paths to their
+local source, planning, schema, evidence, and generated-output layout.
+
 ### Discovering product-specific concretes
 
 Framework docs and templates do not hardcode product namespaces, API filenames, or entity names. The agent discovers these at session time from the product repo:
 
 - **Tech stack** → `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+- **Prompt context layers** → `{PRODUCT_ROOT}/planning-mds/context-map.yaml`, when present
 - **Entity-to-file bindings** → `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml` and `canonical-nodes.yaml`
 - **API spec location** → declared in `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`; agents do not assume a filename
 
@@ -225,6 +230,7 @@ Use these clauses when they apply:
 
 - `Before loading references, consult agents/ROUTER.md and load only the task-matched subset.`
 - `Before broad product discovery, load {PRODUCT_ROOT}/.agentignore if present and honor it as a gitignore-style agent retrieval guard.`
+- `If {PRODUCT_ROOT}/planning-mds/context-map.yaml exists, follow its default/on-demand layers before opening product files.`
 - `Before searching code, run python3 {PRODUCT_ROOT}/scripts/kg/hint.py <path> to get KG routing context.`
 - `If ontology coverage exists, load the matching knowledge-graph entry before reading raw files.`
 - `Use ontology mappings as compressed retrieval context only; source artifacts win on conflict.`
