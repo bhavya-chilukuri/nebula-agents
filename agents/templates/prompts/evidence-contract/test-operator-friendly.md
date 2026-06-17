@@ -1,4 +1,4 @@
-This prompt encodes the test action under `feature-evidence-package-standardization-plan-v2.md` (effective `2026-05-19`). Test runs in two modes: feature-scoped (QE reports land in an existing feature run folder driven by `feature.md` G2) or standalone (QE reports land in a base run evidence folder, do NOT satisfy any feature evidence requirement).
+This prompt encodes the test action under the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`). Test runs in two modes: feature-scoped (QE reports land in an existing feature run folder driven by `feature.md` G2) or standalone (QE reports land in a base run evidence folder, do NOT satisfy any feature evidence requirement).
 
 REQUIRED INPUTS (you must set):
 - `MODE={feature-scoped | standalone}`

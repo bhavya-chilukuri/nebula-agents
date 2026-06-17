@@ -1,5 +1,5 @@
 ACTION: agents/actions/blog.md
-CONTRACT: feature-evidence-package-standardization-plan-v2.md (effective 2026-05-19)
+CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 CONTRACT SCOPE: Blog produces development logs, technical articles, and channel amplification content. It is OUTSIDE the feature evidence contract — it does NOT produce role reports, is NOT evidence for any completed terminal feature, and is NOT required by any validator. It still produces a base run evidence package per §8 so the blog run is auditable.
 
 REQUIRED INPUTS (operator must set before SESSION_SETUP):

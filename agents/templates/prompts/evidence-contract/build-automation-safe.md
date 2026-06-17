@@ -1,5 +1,5 @@
 ACTION: agents/actions/build.md
-CONTRACT: feature-evidence-package-standardization-plan-v2.md (effective 2026-05-19)
+CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 
 REQUIRED INPUTS (operator must set before SESSION_SETUP):
   BUILD_SCOPE:          [{F####}, {F####}, ...]            # features marked Done/Archived in this build (may be empty for non-feature builds)
@@ -28,7 +28,7 @@ SESSION_SETUP:
     suffix = `python3 -c "import secrets; print(secrets.token_hex(4))"`
     BUILD_RUN_ID = {date}-{suffix}
   DO NOT use uuid4. DO NOT regenerate {BUILD_RUN_ID} after the session starts.
-- Create the build run folder under the base run evidence profile (§8 of v2 plan):
+- Create the build run folder under the base run evidence profile from the public Feature Evidence Contract:
     BUILD_RUN_FOLDER = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BUILD_RUN_ID}/
     mkdir -p {BUILD_RUN_FOLDER}
 - Initialize {BUILD_RUN_FOLDER} base run files from templates: README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log (empty JSONL), lifecycle-gates.log (empty)
@@ -149,6 +149,6 @@ NON-FEATURE BUILD RUNS:
 
 CONFLICT RESOLUTION:
 - feature evidence package present but STATUS.md missing current signoff rows → halt; feature is not closeout-ready
-- REGISTRY.md says Archived but feature evidence package missing or non-approved → halt; do not retroactively backfill (per §4 non-goal); fix REGISTRY.md instead
+- REGISTRY.md says Archived but feature evidence package missing or non-approved → halt; do not retroactively backfill pre-contract evidence; fix REGISTRY.md instead
 - Per-feature manifest disagrees with STATUS.md current verdicts → fix the feature (run its G5 again) before continuing the build
 - Build re-closing a feature that already has an approved package → produce a NEW {RUN_ID}, set RERUN_OF appropriately, and run patch-prior-manifest.py before writing the new latest-run.json at B4

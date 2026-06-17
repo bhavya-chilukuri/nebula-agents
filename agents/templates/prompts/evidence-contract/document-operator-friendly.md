@@ -1,4 +1,4 @@
-This prompt encodes the document action under `feature-evidence-package-standardization-plan-v2.md` (effective `2026-05-19`). Document produces technical documentation (API docs, READMEs, runbooks, developer guides). It is OUTSIDE the feature evidence contract — it does NOT produce role reports for any feature evidence package and does NOT substitute for evidence on a completed terminal feature. It still produces a base run evidence package per §8 so the documentation run itself is auditable.
+This prompt encodes the document action under the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`). Document produces technical documentation (API docs, READMEs, runbooks, developer guides). It is OUTSIDE the feature evidence contract — it does NOT produce role reports for any feature evidence package and does NOT substitute for evidence on a completed terminal feature. It still produces a base run evidence package per §8 so the documentation run itself is auditable.
 
 REQUIRED INPUTS (you must set):
 - `DOC_SCOPE={api | readme | runbook | developer-guide | release-notes | mixed}`

@@ -1,5 +1,5 @@
 ACTION: agents/actions/review.md
-CONTRACT: feature-evidence-package-standardization-plan-v2.md (effective 2026-05-19)
+CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 CONTRACT SCOPE: Review can run in two modes:
   (a) feature-scoped: writes code-review-report.md and security-review-report.md (when required) INTO an existing feature run folder under the canonical evidence package; the parent feature action drives the gates
   (b) standalone: writes review reports under a base run evidence folder; does NOT produce a feature evidence package

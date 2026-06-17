@@ -1,5 +1,5 @@
 ACTION: agents/actions/plan.md
-CONTRACT: feature-evidence-package-standardization-plan-v2.md (effective 2026-05-19)
+CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 CONTRACT SCOPE: Plan runs BEFORE the feature evidence package exists. It produces planning artifacts (feature-assembly-plan.md, PRD updates, ADRs, story breakdowns) inside {FEATURE_PATH}. It also produces a base run evidence package per §8 at the non-feature run path.
 
 REQUIRED INPUTS (operator must set before SESSION_SETUP):

@@ -1,5 +1,5 @@
 ACTION: agents/actions/init.md
-CONTRACT: feature-evidence-package-standardization-plan-v2.md (effective 2026-05-19)
+CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 CONTRACT SCOPE: Init bootstraps a new product. It runs BEFORE any feature exists, so there is no feature evidence package to produce. Init still produces a base run evidence package per §8 so the bootstrap itself is auditable.
 
 REQUIRED INPUTS (operator must set before SESSION_SETUP):
@@ -87,4 +87,4 @@ EXIT VALIDATION (run in order; all exit 0):
 
 CONFLICT RESOLUTION:
 - Operator wants effective date earlier than framework default → refuse; new products inherit the framework default at minimum
-- Operator wants to backfill historical features during init → out of scope per §4 non-goals; init creates an empty registry only
+- Operator wants to backfill historical features during init → out of scope for init; init creates an empty registry only

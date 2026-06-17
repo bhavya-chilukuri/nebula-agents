@@ -1,4 +1,4 @@
-This prompt encodes the build action under the feature evidence contract from `feature-evidence-package-standardization-plan-v2.md` (effective `2026-05-19`).
+This prompt encodes the build action under the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`).
 
 REQUIRED INPUTS (you must set):
 - `BUILD_SCOPE=[{F####}, {F####}, ...]` — features marked Done/Archived in this build (may be empty for non-feature builds)
@@ -16,7 +16,7 @@ Echo the resolved absolute `{PRODUCT_ROOT}` path on your first turn before any s
 
 Generate `{BUILD_RUN_ID}` once at session start using the contract format `YYYY-MM-DD-[a-z0-9]{8}` — the date is the local date and the 8-character suffix comes from cryptographic randomness, e.g. `python3 -c "import secrets; print(secrets.token_hex(4))"`. Do not use `uuid4`. Do not regenerate `{BUILD_RUN_ID}` after the session starts.
 
-Set up the build run folder under the base run evidence profile (§8 of the v2 plan). Create `BUILD_RUN_FOLDER` and initialize the base run files from templates: `README.md`, `action-context.md`, `artifact-trace.md`, `gate-decisions.md`, an empty `commands.log` (JSONL), and an empty `lifecycle-gates.log`. The build run folder is NOT a feature evidence package — every feature you close in this build keeps its own package at that feature's `RUN_FOLDER`.
+Set up the build run folder under the base run evidence profile from the public Feature Evidence Contract. Create `BUILD_RUN_FOLDER` and initialize the base run files from templates: `README.md`, `action-context.md`, `artifact-trace.md`, `gate-decisions.md`, an empty `commands.log` (JSONL), and an empty `lifecycle-gates.log`. The build run folder is NOT a feature evidence package — every feature you close in this build keeps its own package at that feature's `RUN_FOLDER`.
 
 Determine `BUILD_SCOPE`: the set of feature IDs this build closes or archives. Record it in `{BUILD_RUN_FOLDER}/action-context.md` as the first artifact.
 
@@ -58,6 +58,6 @@ If this build does NOT close or archive any feature, still produce the base run 
 
 Resolve conflicts like this:
 - feature evidence package present but `STATUS.md` missing current signoff rows → halt; the feature is not closeout-ready
-- `REGISTRY.md` says `Archived` but feature evidence package is missing or non-approved → halt; do not retroactively backfill (per §4 non-goal); fix `REGISTRY.md` instead
+- `REGISTRY.md` says `Archived` but feature evidence package is missing or non-approved → halt; do not retroactively backfill pre-contract evidence; fix `REGISTRY.md` instead
 - per-feature manifest disagrees with `STATUS.md` current verdicts → fix the feature (re-run G5) before continuing the build
 - build re-closing a feature that already has an approved package → produce a NEW `{RUN_ID}` for that feature, set `RERUN_OF` appropriately, and run `patch-prior-manifest.py` before writing the new `latest-run.json` at B4

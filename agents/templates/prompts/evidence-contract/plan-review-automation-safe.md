@@ -1,5 +1,5 @@
 ACTION: agents/actions/plan-review.md
-CONTRACT: feature-evidence-package-standardization-plan-v2.md (effective 2026-05-19)
+CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 CONTRACT SCOPE: Plan review is a read-only post-plan readiness audit. It answers "Is this plan ready to build?" and writes a base run evidence package with plan-review-report.md. It never writes into a feature evidence package and never repairs plan artifacts during review.
 
 REQUIRED INPUTS (operator must set before SESSION_SETUP):

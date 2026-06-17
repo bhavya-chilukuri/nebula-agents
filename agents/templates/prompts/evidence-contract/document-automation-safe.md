@@ -1,5 +1,5 @@
 ACTION: agents/actions/document.md
-CONTRACT: feature-evidence-package-standardization-plan-v2.md (effective 2026-05-19)
+CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 CONTRACT SCOPE: Document produces technical documentation (API docs, READMEs, runbooks, developer guides). It is OUTSIDE the feature evidence contract — it does NOT produce role reports for any feature evidence package and does NOT need to be cited as evidence for a completed terminal feature. It still produces a base run evidence package per §8 so the documentation run is auditable.
 
 REQUIRED INPUTS (operator must set before SESSION_SETUP):

@@ -1,4 +1,4 @@
-This prompt encodes the plan-review action under `feature-evidence-package-standardization-plan-v2.md` (effective `2026-05-19`). Plan review is a read-only post-plan readiness audit. It answers: `Is this plan ready to build?` It produces a base run evidence package per section 8 with `plan-review-report.md`; it does NOT write into any feature evidence package or repair planning artifacts.
+This prompt encodes the plan-review action under the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`). Plan review is a read-only post-plan readiness audit. It answers: `Is this plan ready to build?` It produces a base run evidence package per section 8 with `plan-review-report.md`; it does NOT write into any feature evidence package or repair planning artifacts.
 
 REQUIRED INPUTS (you must set):
 - `PLAN_SCOPE={feature | feature-set | project}`

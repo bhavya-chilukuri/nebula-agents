@@ -326,6 +326,7 @@ def write_artifacts(run_folder: Path, manifest: dict[str, Any], stage: str = "G0
     if stage in {"G3", "G5", "G6", "G8", "closeout"}:
         gate_rows.append("G3")
     if stage in {"G5", "G6", "G8", "closeout"}:
+        gate_rows.append("G4")
         gate_rows.append("G5")
     if stage in {"G6", "G8", "closeout"}:
         gate_rows.append("G6")

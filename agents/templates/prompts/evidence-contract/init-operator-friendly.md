@@ -1,4 +1,4 @@
-This prompt encodes the init action under `feature-evidence-package-standardization-plan-v2.md` (effective `2026-05-19`). Init bootstraps a brand-new product — there are no features yet, so no feature evidence package exists. Init still produces a base run evidence package per §8 so the bootstrap itself is auditable.
+This prompt encodes the init action under the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`). Init bootstraps a brand-new product — there are no features yet, so no feature evidence package exists. Init still produces a base run evidence package per §8 so the bootstrap itself is auditable.
 
 REQUIRED INPUTS (you must set):
 - `PROJECT_NAME={string}`
@@ -51,4 +51,4 @@ Close the run by executing these in order, each exit 0:
 
 Resolve conflicts like this:
 - operator wants an effective date earlier than the framework default → refuse; new products inherit the framework default at minimum
-- operator wants to backfill historical features during init → out of scope per §4 non-goals; init creates an empty registry only
+- operator wants to backfill historical features during init → out of scope for init; init creates an empty registry only

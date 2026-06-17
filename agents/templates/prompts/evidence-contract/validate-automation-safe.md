@@ -1,5 +1,5 @@
 ACTION: agents/actions/validate.md
-CONTRACT: feature-evidence-package-standardization-plan-v2.md (effective 2026-05-19)
+CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 CONTRACT SCOPE: Validate is a parallel-agent validation action. Product Manager validates requirements and Architect validates architecture; when implementation is in scope, they additionally invoke the framework validators (validate-feature-evidence.py, validate-trackers.py, kg/validate.py, generate-story-index.py, validate_templates.py) as tools. The action produces a base run evidence package per §8 with per-agent validation reports; it does NOT write into any feature evidence package.
 
 REQUIRED INPUTS (operator must set before SESSION_SETUP):
@@ -115,7 +115,7 @@ EVIDENCE OUTPUTS (in {VALIDATE_RUN_FOLDER}):
 
 STOP CONDITIONS:
 - Any validator returns exit code 2 (validator invocation error) — escalate to user
-- Any error-severity rule fires on a governed completed terminal feature and the operator does not authorize the validator-defect waiver path per §28
+- Any error-severity rule fires on a governed completed terminal feature and the operator does not authorize the validator-defect waiver path documented in `agents/docs/AGENT-OPS.md`
 - KG drift detected and not auto-repairable
 - Effective-date override attempted with earlier-than-default value
 - Two approved manifests detected for the same feature (rule two_approved_runs_without_supersession_fails) — escalate to PM

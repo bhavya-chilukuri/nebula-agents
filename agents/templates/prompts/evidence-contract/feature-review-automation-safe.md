@@ -1,5 +1,5 @@
 ACTION: agents/actions/feature-review.md
-CONTRACT: feature-evidence-package-standardization-plan-v2.md (effective 2026-05-19)
+CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 CONTRACT SCOPE: Feature review is a read-only post-feature completion audit. It answers "Is this feature truly done?" and writes a base run evidence package with feature-review-report.md. It reads, but never writes, the canonical feature evidence package.
 
 REQUIRED INPUTS (operator must set before SESSION_SETUP):

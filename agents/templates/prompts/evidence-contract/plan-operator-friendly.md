@@ -1,4 +1,4 @@
-This prompt encodes the plan action under the base run evidence contract from `feature-evidence-package-standardization-plan-v2.md` (effective `2026-05-19`). Plan runs BEFORE the feature evidence package exists — it produces planning artifacts in `{FEATURE_PATH}` and a base run evidence package per §8, but no feature evidence package. The feature evidence package itself is created later by `agents/actions/feature.md` for the same `FEATURE_ID`.
+This prompt encodes the plan action under the base run evidence profile in the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`). Plan runs BEFORE the feature evidence package exists — it produces planning artifacts in `{FEATURE_PATH}` and a base run evidence package, but no feature evidence package. The feature evidence package itself is created later by `agents/actions/feature.md` for the same `FEATURE_ID`.
 
 REQUIRED INPUTS (you must set):
 - `FEATURE_ID={F####}`

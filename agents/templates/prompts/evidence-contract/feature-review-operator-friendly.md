@@ -1,4 +1,4 @@
-This prompt encodes the feature-review action under `feature-evidence-package-standardization-plan-v2.md` (effective `2026-05-19`). Feature review is a read-only post-feature completion audit. It answers: `Is this feature truly done?` It produces a base run evidence package per section 8 with `feature-review-report.md`; it reads the feature evidence package but does NOT write into it.
+This prompt encodes the feature-review action under the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`). Feature review is a read-only post-feature completion audit. It answers: `Is this feature truly done?` It produces a base run evidence package per section 8 with `feature-review-report.md`; it reads the feature evidence package but does NOT write into it.
 
 REQUIRED INPUTS (you must set):
 - `FEATURE_ID={F####}`

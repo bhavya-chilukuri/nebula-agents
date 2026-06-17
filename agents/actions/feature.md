@@ -117,7 +117,7 @@ Load in this order when the work is feature-scoped:
 
 ## Canonical Evidence Package
 
-Every governed completed-terminal feature run writes its evidence into the canonical package shape (§10) at:
+Every governed completed-terminal feature run writes its evidence into the canonical package shape defined by the Feature Evidence Contract in `CONSUMER-CONTRACT.md` at:
 
 ```text
 {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/
@@ -125,7 +125,7 @@ Every governed completed-terminal feature run writes its evidence into the canon
 
 The feature index root lives separately at `{PRODUCT_ROOT}/planning-mds/operations/evidence/features/F####-{slug}/` and carries `latest-run.json` once the run is approved.
 
-The §17 stage matrix dictates which artifacts must exist at each gate. The full set produced by closeout:
+The stage validation contract dictates which artifacts must exist at each gate. The full set produced by closeout:
 
 - `README.md` (template: `agents/templates/feature-evidence-readme-template.md`)
 - `evidence-manifest.json` (template: `agents/templates/evidence-manifest-template.json`)
@@ -148,20 +148,20 @@ The §17 stage matrix dictates which artifacts must exist at each gate. The full
 - `kg-reconciliation.md` (Architect output at `G7`; template: `agents/templates/kg-reconciliation-template.md`) — the as-built-vs-graph binding delta, new/affirmed canonical nodes, and the green-validator record
 - `pm-closeout.md` (template: `agents/templates/pm-closeout-template.md`)
 
-The feature index root also carries `latest-run.json` (§12) once the run is approved.
+The feature index root also carries `latest-run.json` once the run is approved.
 
-Run-ID format: `YYYY-MM-DD-XXXXXXXX` per §11 — date is local-at-session-start; `XXXXXXXX` is 8-char hex from cryptographic randomness (e.g. `secrets.token_hex(4)`). The run ID is recorded in `action-context.md` and the manifest at G0 and carried unchanged through closeout. Validators must not infer the active run by sorting folders; see §17 for run-resolution rules.
+Run-ID format: `YYYY-MM-DD-XXXXXXXX` — date is local-at-session-start; `XXXXXXXX` is 8-char hex from cryptographic randomness (e.g. `secrets.token_hex(4)`). The run ID is recorded in `action-context.md` and the manifest at G0 and carried unchanged through closeout. Validators must not infer the active run by sorting folders; use the Feature Evidence Contract run-resolution rules.
 
-### Closeout Supersession-And-Publish Sequence (§17 step 4)
+### Closeout Supersession-And-Publish Sequence
 
 When this action writes a new `latest-run.json` at G8/closeout, perform exactly this order:
 
 1. Invoke `agents/product-manager/scripts/patch-prior-manifest.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}` to mark every prior approved manifest for this feature as `superseded`. The helper is idempotent and exits 0 with no priors.
 2. Only after step 1 succeeds, write `latest-run.json` pointing at the new run.
 
-If step 1 fails, do not proceed to step 2. Surface the failure with the operator runbook reference (`feature-evidence-package-standardization-plan-v2.md` §28 Phase 5 "Partial-closeout recovery"). Validator catch-rule `two_approved_runs_without_supersession_fails` enforces the invariant as defense in depth.
+If step 1 fails, do not proceed to step 2. Surface the failure with the partial-closeout recovery guidance in `agents/docs/MANUAL-ORCHESTRATION-RUNBOOK.md`. Validator catch-rule `two_approved_runs_without_supersession_fails` enforces the invariant as defense in depth.
 
-### Per-Gate Evidence Validation (§17 / §24)
+### Per-Gate Evidence Validation
 
 Run `validate-feature-evidence.py` after producing each gate's artifacts so missing evidence is caught at the gate, not at closeout. Use the in-progress `--run-id` mode for gates before `latest-run.json` exists.
 
@@ -172,11 +172,11 @@ Run `validate-feature-evidence.py` after producing each gate's artifacts so miss
 | G2   | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G2` | `G2` |
 | G3   | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G3` | `G3` |
 | G5 | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G5` | `G5` |
-| G6 | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G6` | `G6` candidate validation; runs **before** tracker sync per §17 step 1-2 |
+| G6 | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G6` | `G6` candidate validation; runs **before** tracker sync |
 | G7 | `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols && python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` | Architect KG reconciliation — semantic-graph (`code-index.yaml` / `canonical-nodes.yaml`) bound against the as-built source; symbol + drift checks exit 0. Binds **code** paths only (stable across the closeout archive move) |
-| G8 | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` | After §17 step 4 completes — `latest-run.json`, `kg-reconciliation.md`, and `pm-closeout.md` must exist; tracker results must be in `lifecycle-gates.log` |
+| G8 | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` | After supersession-and-publish completes — `latest-run.json`, `kg-reconciliation.md`, and `pm-closeout.md` must exist; tracker results must be in `lifecycle-gates.log` |
 
-Stage-validation failures must be repaired before advancing the gate. Do not skip stage validation even when the missing artifact "will land later" — §17's stage matrix declares exactly which artifacts must exist by stage.
+Stage-validation failures must be repaired before advancing the gate. Do not skip stage validation even when the missing artifact "will land later" — the Feature Evidence Contract stage matrix declares exactly which artifacts must exist by stage.
 
 ## Stop Conditions
 
@@ -193,12 +193,12 @@ Stage-validation failures must be repaired before advancing the gate. Do not ski
 Run in this order. Steps are grouped by gate; the `G7` architect group binds **code** paths (stable across the archive move) and the `G8` group runs the path-sensitive regeneration **after** the closeout archive move.
 
 1. Applicable backend / frontend / AI / QE runtime commands for changed surfaces, with evidence paths recorded under `{PRODUCT_ROOT}/planning-mds/operations/evidence/**`
-2. **[G6]** `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G6` (candidate validation before tracker sync per §17 step 1)
-3. **[G6]** `python3 agents/product-manager/scripts/validate-trackers.py` (calls feature-evidence at `--stage G6` per §22; appends tracker results to `lifecycle-gates.log`)
+2. **[G6]** `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G6` (candidate validation before tracker sync)
+3. **[G6]** `python3 agents/product-manager/scripts/validate-trackers.py` (calls feature-evidence at `--stage G6`; appends tracker results to `lifecycle-gates.log`)
 4. **[G7]** `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols` when code in bound files changed (architect; after confirming/adding `code-index.yaml` bindings + `canonical-nodes.yaml` entries for the as-built source)
 5. **[G7]** `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols`
 6. **[G7]** `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (the architect's semantic graph must be green before closeout)
-7. **[G8]** After §17 step 4 completes (`patch-prior-manifest.py` then `latest-run.json`) and the feature folder has been moved to `archive/`: `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout`
+7. **[G8]** After supersession-and-publish completes (`patch-prior-manifest.py` then `latest-run.json`) and the feature folder has been moved to `archive/`: `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout`
 8. **[G8]** `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/` when story files moved/changed
 9. **[G8]** `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` — run **after** the archive move, because it binds the (now-moved) feature-doc paths; running it earlier re-stales on the move
 10. **[G8]** `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (final confirmation the post-move graph is green)
@@ -778,7 +778,7 @@ Before setting feature status to `Done` or moving to archive, verify role signof
 3. Confirm the manifest is a pre-closeout candidate: `status: in-progress`, `gate_results` through `signoff` present, and `pm_closeout` / `tracker_sync` absent or `required: false` (no `latest-run.json` yet).
 4. Run candidate stage validation:
    - `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G6`
-5. Run tracker validation (it internally calls feature-evidence at `--stage G6` per §22) and append the result to `lifecycle-gates.log`:
+5. Run tracker validation (it internally calls feature-evidence at `--stage G6`) and append the result to `lifecycle-gates.log`:
    - `python3 agents/product-manager/scripts/validate-trackers.py`
 
 **Gate Criteria:**

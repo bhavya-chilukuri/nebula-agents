@@ -198,9 +198,42 @@ See `TECH-STACK-ADAPTATION.md` (when present) for stack-swap walkthroughs.
 
 ## Feature Evidence Contract
 
-Effective `2026-05-19`. Replaces the legacy `feature` artifact row. See `feature-evidence-package-standardization-plan-v2.md` for the normative contract.
+Effective `2026-05-19`. This section is the public normative contract for framework run evidence and completed-terminal feature evidence. It replaces the legacy `feature` artifact row.
 
-### Base Run Evidence (§8)
+The evidence validator, fixtures, and prompt templates use stable section labels as rule taxonomy:
+
+| Label | Public contract area |
+|-------|----------------------|
+| `§7` | Conditional scope booleans and forced roles |
+| `§8` | Base run evidence |
+| `§9` / `§10` | Feature completion profile and artifact matrix |
+| `§11` | Manifest schema, role results, gate results, and reruns |
+| `§12` | `latest-run.json` schema |
+| `§13` | `commands.log` JSONL schema and command evidence |
+| `§14` | Role report headings and result values |
+| `§15` | Recommendation and PM acceptance format |
+| `§16` | `STATUS.md` signoff provenance |
+| `§17` | Stage validation, run resolution, and closeout publish order |
+| `§18` | Waivers, omissions, and deferrals |
+| `§20` | Global frontend evidence lanes |
+| `§21` | Cross-artifact consistency |
+| `§22` | Feature evidence validator behavior |
+| `§23` | Required fixture coverage |
+| `§24` / `§25` | Framework file and template alignment |
+
+### Eligibility And Effective Date
+
+The feature evidence profile applies to governed completed-terminal feature runs:
+
+- Archived completed features with `REGISTRY.md` `Archived Date` before `2026-05-19` are skipped by feature evidence validation, while normal tracker/link validation still applies.
+- Archived completed features with `Archived Date` on or after `2026-05-19` require a canonical feature evidence package.
+- Active `Done`/`Complete`/`Completed` terminal features require canonical evidence unless `STATUS.md` has a `Closeout Summary` table row named `Closeout review date` with a parseable ISO date before `2026-05-19`.
+- Missing, placeholder, or malformed active closeout dates do not qualify for the pre-contract skip; validators treat those features as governed by the current validation date.
+- A pre-contract archived feature that is reopened, materially changed, or re-closed after the effective date must carry `Evidence Reentry Date = YYYY-MM-DD` on the archived registry row. A reentry date on or after `2026-05-19` requires canonical evidence.
+- Retired features with `Terminal Status = Abandoned` or `Superseded` are registry-only records. They are skipped by feature evidence validation and never satisfy completed-feature evidence requirements.
+- The framework does not migrate, normalize, index, or backfill pre-contract archived feature evidence.
+
+### Base Run Evidence
 
 Every orchestrated run produces a base evidence package. Non-feature/manual runs (e.g. `agents/actions/validate.md`) use the base path:
 
@@ -214,9 +247,9 @@ Every orchestrated run produces a base evidence package. Non-feature/manual runs
   lifecycle-gates.log
 ```
 
-### Feature Completion Profile (§9, §10)
+### Feature Completion Profile
 
-Feature completion runs (`agents/actions/feature.md` and `agents/actions/build.md` when archiving a delivered feature) write to the feature profile path with the full §10 artifact matrix:
+Feature completion runs (`agents/actions/feature.md` and `agents/actions/build.md` when archiving a delivered feature) write to the feature profile path with the full artifact matrix:
 
 ```text
 {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/
@@ -240,13 +273,39 @@ Feature completion runs (`agents/actions/feature.md` and `agents/actions/build.m
   latest-run.json                 # pointer to approved run + manifest
 ```
 
-### Global Frontend Lanes (§20)
+Run IDs use `YYYY-MM-DD-XXXXXXXX`, where the date is local-at-session-start and `XXXXXXXX` is 8 lowercase hex characters from cryptographic randomness. The run ID is recorded at run creation and carried unchanged through closeout.
+
+`evidence-manifest.json` is required for feature profile runs. It records feature identity, run identity, status, effective date, feature start/closeout paths, changed paths, SCM diff evidence, conditional scope booleans, required roles, gate results, role results, files, omissions, waivers, and global evidence references. Paths in manifest fields must be repo-relative and must not traverse upward.
+
+The conditional scope booleans are explicit and must not be inferred from prose alone:
+
+- `runtime_bearing` — runtime source, runtime tests, AI runtime, migrations, executable workflows, or runtime-affecting docs changed.
+- `deployment_config_changed` — Dockerfiles, compose files, CI/deployment jobs, env/config contracts, migrations, startup scripts, secrets/config docs, or runtime topology changed. This forces DevOps evidence.
+- `frontend_in_scope` — frontend application, UI tests, routes, components, styling, UX/accessibility behavior, screenshots, or visual evidence changed.
+- `security_sensitive_scope` — auth, authorization, identity, permissions, secrets, policy enforcement, PII, audit logging, or dependency/security controls changed. This forces Security evidence.
+
+Quality Engineer and Code Reviewer evidence is required for every governed completed-terminal feature. DevOps is required when `deployment_config_changed = true` or marked required in `STATUS.md`. Security Reviewer is required when `security_sensitive_scope = true` or marked required in `STATUS.md`. Architect evidence is required when marked required in `STATUS.md`; the feature action also requires G0 assembly-plan validation and, for runs effective on or after `2026-06-01`, G7 knowledge-graph reconciliation at closeout.
+
+`latest-run.json` lives under the feature index root and is written only for an approved run. It points to the approved run and manifest, uses repo-relative paths, and must agree with the approved manifest.
+
+### Stage Validation And Closeout
+
+Validators must not create or consume `current-run.json`, and must not infer the active run by sorting run folders. Before `latest-run.json` exists, the action provides the active run through `--run-id`.
+
+- `G0` through `G5` validation requires an explicit `--run-id`.
+- `G6` candidate validation uses `--run-id` and runs before tracker/story-index/KG/template closeout results are finalized.
+- `G7` records architect knowledge-graph reconciliation for the as-built source.
+- `G8`/`closeout` validation requires `latest-run.json`, `kg-reconciliation.md` when applicable, `pm-closeout.md`, and tracker/story-index/KG/template validator results recorded in `lifecycle-gates.log` and summarized in `pm-closeout.md`.
+
+When publishing a newly approved run, closeout must first run `agents/product-manager/scripts/patch-prior-manifest.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}` to mark prior approved manifests for the feature as `superseded`. Only after that helper exits 0 may closeout write the feature's new `latest-run.json`. If the helper fails, do not publish the new pointer; follow the partial-closeout recovery guidance in `agents/docs/MANUAL-ORCHESTRATION-RUNBOOK.md`.
+
+### Global Frontend Lanes
 
 `planning-mds/operations/evidence/frontend-quality/` and `planning-mds/operations/evidence/frontend-ux/` remain valid global lanes. They may be referenced from feature evidence (`global_evidence_refs` in the manifest) but do not substitute for feature-level role reports.
 
 ### Validators
 
-- `agents/product-manager/scripts/validate-feature-evidence.py` — feature evidence package consistency (§22).
-- `agents/product-manager/scripts/validate-trackers.py` — tracker/registry consistency, calls feature-evidence at `--stage G6` after tracker validation (§22 integration).
-- `agents/product-manager/scripts/patch-prior-manifest.py` — closeout supersession helper called before writing `latest-run.json` (§17 step 4, §24).
-- `agents/scripts/validate_templates.py` — template/action alignment, including the §24 `tpl_*` rules.
+- `agents/product-manager/scripts/validate-feature-evidence.py` — feature evidence package consistency, effective-date eligibility, manifest schema, role/gate reconciliation, stage validation, and cross-artifact checks.
+- `agents/product-manager/scripts/validate-trackers.py` — tracker/registry consistency; invokes feature-evidence validation at `--stage G6` for governed feature closeout without creating a circular dependency on final closeout evidence.
+- `agents/product-manager/scripts/patch-prior-manifest.py` — closeout supersession helper called before writing `latest-run.json`.
+- `agents/scripts/validate_templates.py` — template/action alignment, including evidence-template alignment rules.

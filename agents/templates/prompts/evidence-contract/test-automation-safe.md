@@ -1,5 +1,5 @@
 ACTION: agents/actions/test.md
-CONTRACT: feature-evidence-package-standardization-plan-v2.md (effective 2026-05-19)
+CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 CONTRACT SCOPE: Test can run in two modes:
   (a) feature-scoped: writes test-plan.md, test-execution-report.md, coverage-report.md INTO an existing feature run folder; the parent feature action drives G2 and G5
   (b) standalone: writes QE reports under a base run evidence folder; does NOT produce a feature evidence package

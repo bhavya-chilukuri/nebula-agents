@@ -1,4 +1,4 @@
-This prompt encodes an ad hoc defect/bugfix run under the base run evidence contract from `feature-evidence-package-standardization-plan-v2.md` (effective `2026-05-19`). Defect runs are outside the feature completion profile by default: they may change code, docs, tests, or planning notes, but they do NOT create feature evidence, do NOT satisfy completed-feature closeout requirements, and do NOT write `latest-run.json` unless explicitly promoted to a formal feature/build run.
+This prompt encodes an ad hoc defect/bugfix run under the base run evidence profile in the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`). Defect runs are outside the feature completion profile by default: they may change code, docs, tests, or planning notes, but they do NOT create feature evidence, do NOT satisfy completed-feature closeout requirements, and do NOT write `latest-run.json` unless explicitly promoted to a formal feature/build run.
 
 REQUIRED INPUTS (you must set):
 - `DEFECT_SUMMARY=` — short description of the bug or failure being chased
