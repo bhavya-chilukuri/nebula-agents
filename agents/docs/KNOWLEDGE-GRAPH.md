@@ -226,6 +226,7 @@ know what else moves with you.
 | `workstate.py --state-file <p> escalate "<reason>" --nodes ... --opened-raw ...` | Record an explicit insufficient-context climb |
 | `workstate.py --state-file <p> dump --compact` | Recover structured state after context compaction |
 | `workstate.py --state-file <p> dump --current-view` | Decisions with superseded topics filtered out |
+| `workstate.py --state-file <p> digest` | Terse work-narrative (done / decided / next) — cheaper to rehydrate on resume than a full `dump` |
 
 ### MCP server (same retrieval, structured transport)
 
@@ -241,7 +242,7 @@ and the fallback for non-MCP harnesses.
 | `kg_hint` | `hint.py` | pre-search routing; returns a structured (possibly empty) payload |
 | `kg_blast` | `blast.py` | impact radius; `compact` for summary only |
 | `kg_validate` | `validate.py` (read-only modes) | `check-drift\|check-symbols\|check-orphans\|check-coverage-gaps` → `{ok, errors, warnings}`; never mutates |
-| `kg_workstate` | `workstate.py` | the only writer; writes **only** under `{PRODUCT_ROOT}/.kg-state/workstate/<session>.yaml` (traversal/KG-dir writes rejected) |
+| `kg_workstate` | `workstate.py` | the only writer; actions init/decision/escalate/dump/digest; writes **only** under `{PRODUCT_ROOT}/.kg-state/workstate/<session>.yaml` (traversal/KG-dir writes rejected) |
 
 **Launch config — two cases:**
 
