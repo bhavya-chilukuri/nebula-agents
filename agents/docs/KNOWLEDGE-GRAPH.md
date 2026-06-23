@@ -226,6 +226,41 @@ know what else moves with you.
 | `workstate.py --state-file <p> escalate "<reason>" --nodes ... --opened-raw ...` | Record an explicit insufficient-context climb |
 | `workstate.py --state-file <p> dump --compact` | Recover structured state after context compaction |
 | `workstate.py --state-file <p> dump --current-view` | Decisions with superseded topics filtered out |
+| `workstate.py --state-file <p> digest` | Terse work-narrative (done / decided / next) — cheaper to rehydrate on resume than a full `dump` |
+
+### MCP server (same retrieval, structured transport)
+
+For harnesses that speak MCP, the same retrieval is exposed as local stdio tools by
+`{PRODUCT_ROOT}/scripts/kg/mcp_server.py` (committed `{PRODUCT_ROOT}/.mcp.json` launches
+it). It is a thin adapter over the **same** CLI builders — identical semantics, minified
+JSON payloads, telemetry tagged `source="mcp"`. The CLIs above remain the implementation
+and the fallback for non-MCP harnesses.
+
+| MCP tool | Wraps | Notes |
+|----------|-------|-------|
+| `kg_context` | `lookup.py` | feature/story slice or reverse file lookup; `fields=ids\|summaries\|full`, `tier 1-4`, `include` for top-level projection |
+| `kg_hint` | `hint.py` | pre-search routing; returns a structured (possibly empty) payload |
+| `kg_blast` | `blast.py` | impact radius; `compact` for summary only |
+| `kg_validate` | `validate.py` (read-only modes) | `check-drift\|check-symbols\|check-orphans\|check-coverage-gaps` → `{ok, errors, warnings}`; never mutates |
+| `kg_workstate` | `workstate.py` | the only writer; actions init/decision/escalate/dump/digest; writes **only** under `{PRODUCT_ROOT}/.kg-state/workstate/<session>.yaml` (traversal/KG-dir writes rejected) |
+
+**Launch config — two cases:**
+
+- Session launched **from `{PRODUCT_ROOT}`** → the committed `{PRODUCT_ROOT}/.mcp.json`:
+  ```json
+  { "mcpServers": { "kg": { "command": "python3", "args": ["scripts/kg/mcp_server.py"] } } }
+  ```
+- Session launched **from the `nebula-agents` framework cwd** → the relative path won't
+  resolve, so point at the product copy via `NEBULA_PRODUCT_ROOT` (the same env the
+  framework already uses to locate the product repo — see AGENT-USE.md §resolution):
+  ```json
+  { "mcpServers": { "kg": { "command": "python3",
+      "args": ["${NEBULA_PRODUCT_ROOT}/scripts/kg/mcp_server.py"] } } }
+  ```
+
+The server self-locates the KG from its own file path, so no `PRODUCT_ROOT` env is needed
+at runtime — only the launch path must resolve. MCP-capable harnesses should prefer the
+`kg_*` tools; the CLIs above are the fallback for harnesses without MCP.
 
 ### Other CLIs
 

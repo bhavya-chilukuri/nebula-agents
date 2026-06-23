@@ -59,6 +59,19 @@ The package contents match those produced by `agents/actions/feature.md` (see it
 
 If step 1 fails, do not proceed to step 2; surface the failure with the partial-closeout recovery guidance in `agents/docs/MANUAL-ORCHESTRATION-RUNBOOK.md`. Build-action runs that do not archive a delivered feature use the base run evidence shape only.
 
+### Context Reset Checkpoint (between features)
+
+After a feature's evidence is persisted (its `latest-run.json` written) and **before
+starting the next `FEATURE_ID` in `BUILD_SCOPE`, reset context.** Per-turn cost scales with
+context size, so carrying a finished feature's full working context into the next feature
+is a large cache write over a stale, bloated prefix (the dominant per-turn cost). The reset
+is safe because the feature's state is durable in its evidence package, `STATUS.md`, and the KG.
+
+- Harness-neutral: `/clear` (Claude Code), a fresh run (OpenAI), or a new operator session
+  (manual). The next feature rehydrates from its feature folder + `workstate.py dump`/`digest`.
+- Sequential fallback: a single-window run may skip the reset, but should expect rising
+  per-turn cost across features (visible as cache-write spikes in `eval.py`).
+
 ### Per-Gate Evidence Validation
 
 When this action drives feature closeout, run `validate-feature-evidence.py` at each gate. Use the in-progress `--run-id` form until `latest-run.json` is published:

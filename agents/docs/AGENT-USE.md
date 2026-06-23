@@ -246,6 +246,8 @@ Use these clauses when they apply:
 - `Update STATUS.md before concluding.`
 - `If trackers changed, re-run tracker validation before declaring done.`
 - `If commands or examples are unverified, mark them explicitly instead of implying they were run.`
+- `Do not restate context already loaded; reference it (path/id) instead of repeating it — output tokens are generated and uncached, the most expensive kind.`
+- `Prefer structured/templated output; keep reports and STATUS rows within their length ceilings rather than narrating.`
 
 ## Ontology Ownership
 

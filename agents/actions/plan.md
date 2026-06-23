@@ -458,6 +458,19 @@ Before Phase A approval, synchronize and validate planning trackers:
 
 ---
 
+### Context Reset Checkpoint (Phase A → Phase B)
+
+After Phase A is approved (G3) and its outputs are persisted (BLUEPRINT, stories,
+trackers, `STATUS.md`), **reset context before starting architecture.** Phase B does not
+need Phase A's working context in-window — it rehydrates from the persisted artifacts and
+the KG, so carrying the full Phase A context into Phase B is a large cache write over an
+already-large prefix (the dominant per-turn cost). The reset is safe precisely because
+state is durable outside the window.
+
+- Harness-neutral: `/clear` (Claude Code), a fresh run (OpenAI), or a new operator session
+  (manual). Re-enter via Step 3's required-context list + `workstate.py dump`/`digest`.
+- Skip only if Phase A context is already small (well under the §13.3 budget).
+
 ### Step 3: Execute Architect (Phase B)
 
 **Execution Instructions:**

@@ -236,7 +236,7 @@ class TrackerValidator:
 
         for heading, bucket in sections.items():
             rows = _parse_table(_extract_section(content, heading))
-            if not rows and heading not in {"Planned (Reserved IDs)", "Active Features"}:
+            if not rows and heading not in {"Planned (Reserved IDs)", "Active Features", "Archived Features"}:
                 self.add_error(str(self.registry_path), f"Missing or malformed table for section: {heading}")
 
             for row in rows:

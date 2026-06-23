@@ -43,15 +43,30 @@ The core discipline: **query an index, do not read the repo.**
 | Point at spans, not whole files | symbol + line-range results from `blast.py` / `lookup.py`; `diff-impact.py` maps a diff to symbols | KNOWLEDGE-GRAPH.md |
 | Treat the KG as starting context | KG is a retrieval aid, not the answer — open raw artifacts only on conflict or verification (source precedence: raw wins) | KNOWLEDGE-GRAPH.md |
 
-**Cache tiers.** Order what's loaded by volatility so the model pays cache *reads*
-(≈0.1× input) rather than *writes* (≈1.25×) for stable material. Put a stable
-prefix — system prompt, active `SKILL.md`, `ROUTER`, framework docs,
-`SOLUTION-PATTERNS.md` — ahead of a volatile tail (current instruction, retrieval
-results, latest tool output), and keep that prefix byte-stable (no per-turn
-timestamps or ids inside it). A cache write only pays off when it's re-read before
-it expires, so cache the re-read preamble and leave one-shot reads as plain input.
-Reset context at task boundaries (e.g. between planning phases) so the cached
-prefix doesn't grow unbounded — per-turn cost scales with context size.
+**Cache tiers (read:write discipline).** Order what's loaded by volatility so the model
+pays cache *reads* (≈0.1× input) for stable material instead of *writes* (≈1.25×). Stratify
+into three tiers, most-stable first:
+
+| Tier | Changes | Contents | Caching |
+|------|---------|----------|---------|
+| **0** | never within a session | system prompt, tool defs, active `SKILL.md`, `ROUTER`, framework docs, `SOLUTION-PATTERNS.md` | large cached prefix |
+| **1** | per feature/session | feature folder, linked ADRs, KG slice | ephemeral cache breakpoint |
+| **2** | per turn | current instruction, latest retrieval/tool result, current diff | never cached — always the tail |
+
+Rules: **volatile never above stable** — KG `hint`/`lookup`/`blast` results, file reads, and
+tool output land in the Tier-2 tail, never interleaved into the preamble (otherwise every
+retrieval busts the docs' cache); **keep the Tier-0 prefix byte-identical** across turns — no
+timestamps, `--run-id`, per-turn counters, or varying system-reminders in the cached region
+(the telemetry `--run-id` stamp lives in the tail); **don't cache one-shot content** — a file
+read once is plain 1.0× input, not a 1.25× write. A cache write only pays off when re-read
+before it expires (prefix change, 5-min TTL, or context reset), so cache the re-read preamble
+and reset context at task boundaries (the Phase A→B / between-feature checkpoints in
+`plan.md` / `build.md`) so the prefix doesn't grow unbounded — per-turn cost scales with
+context size.
+
+`eval.py` surfaces the result: a **cache-write spike** with high `write_share` is the
+signature of a busted prefix; `kg_usage.py budget` flags when the loaded prefix exceeds the
+§13.3 70% input budget (see Known gaps).
 
 ## Write — persist context outside the window
 
@@ -92,8 +107,10 @@ telemetry shows it before it becomes habit.
 These are deliberate honesty about where the strategy relies on agents
 following it rather than being forced:
 
-- **No hard context budget.** The agent chooses the tier; nothing caps total
-  context or forces tier-1-first. Convention, not a ceiling.
+- **No *in-window* context budget.** `kg_usage.py budget` checks loaded context against
+  the §13.3 70/30 budget at gate time (exit 1 when over the 70% input budget), but nothing
+  *forces* the agent to run it or to load tier-1-first — it's an advisory gate, not a
+  hard in-window ceiling.
 - **The write layer depends on the agent calling `workstate.py`.** Skip it and
   post-compaction recovery degrades to re-derivation.
 - **Quality gating is partial.** Low-confidence / `ambiguous` edges *halt*

@@ -1,0 +1,34 @@
+# Nebula Agents Planning Blueprint
+
+**Last Updated:** 2026-06-18
+
+## Purpose
+
+This blueprint is the top-level planning index for Nebula Agents. It links feature-level PRDs, implementation stories, and tracker status so product build work can move one step at a time with explicit validation before the next stage starts.
+
+## Product Direction
+
+Nebula Agents should become an operator cockpit for high-quality agentic delivery. The first usable surface preserves the native Codex and Claude Code terminal experience through tmux sessions. The future platform can add managed provider adapters only after the tmux path proves the gate, evidence, recovery, and approval model.
+
+## Feature Plan
+
+- [F0001 - Tmux-Native Agent Cockpit](features/F0001-tmux-native-agent-cockpit/README.md) - Planned / Now
+  - [F0001-S0001 - Provider auth and environment preflight](features/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md) - Not Started
+  - [F0001-S0002 - Tmux session launch and attach](features/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md) - Not Started
+  - [F0001-S0003 - Run registry and evidence watchers](features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md) - Not Started
+  - [F0001-S0004 - Gate and validator dashboard](features/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md) - Not Started
+  - [F0001-S0005 - Native session transcript and recovery](features/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md) - Not Started
+  - [F0001-S0006 - Read-only review and status commands](features/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md) - Not Started
+
+- [F0002 - Managed Agent Orchestration](features/F0002-managed-agent-orchestration/README.md) - Planned / Next
+  - [F0002-S0001 - Provider adapter contract](features/F0002-managed-agent-orchestration/F0002-S0001-provider-adapter-contract.md) - Not Started
+  - [F0002-S0002 - Managed session thread continuity](features/F0002-managed-agent-orchestration/F0002-S0002-managed-session-thread-continuity.md) - Not Started
+  - [F0002-S0003 - Typed gate decision broker](features/F0002-managed-agent-orchestration/F0002-S0003-typed-gate-decision-broker.md) - Not Started
+  - [F0002-S0004 - Streaming event and approval bridge](features/F0002-managed-agent-orchestration/F0002-S0004-streaming-event-and-approval-bridge.md) - Not Started
+  - [F0002-S0005 - Migration from tmux to managed orchestration](features/F0002-managed-agent-orchestration/F0002-S0005-migration-from-tmux-to-managed-orchestration.md) - Not Started
+
+## Validation Policy
+
+- Product planning updates must keep `features/REGISTRY.md`, `features/ROADMAP.md`, `features/STORY-INDEX.md`, and this blueprint synchronized.
+- Story files must use one story per file with IDs matching `F####-S####`.
+- F0001 is the mandatory first delivery path. F0002 must not remove tmux fallback until feature closeout evidence proves parity for interactive prompts, user approvals, terminal visibility, transcript recovery, and validator gates.

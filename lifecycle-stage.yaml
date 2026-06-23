@@ -15,21 +15,25 @@ stages:
     required_gates:
       - boundary_genericness
       - skill_regression
+      - agent_map_schema
   planning:
     description: Framework-side planning of new actions, roles, or templates.
     required_gates:
       - boundary_genericness
       - skill_regression
+      - agent_map_schema
   implementation:
     description: Framework-side implementation of new actions, roles, or templates.
     required_gates:
       - boundary_genericness
       - skill_regression
+      - agent_map_schema
   release-readiness:
     description: Framework release hardening before publishing a new tagged version.
     required_gates:
       - boundary_genericness
       - skill_regression
+      - agent_map_schema
 gates:
   boundary_genericness:
     description: Prevent solution-specific leakage into generic framework agents. Embedded denylist is authoritative; --glossary override is optional.
@@ -41,3 +45,8 @@ gates:
     command:
       - python3
       - agents/scripts/run-skill-regression.py
+  agent_map_schema:
+    description: Validate agent-map.yaml model_tier/execution annotations (Phase 3a) — valid tiers, known execution values, a sequential fallback for parallel actions, and no vendor model ids.
+    command:
+      - python3
+      - agents/scripts/validate_agent_map.py

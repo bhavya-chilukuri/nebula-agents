@@ -23,6 +23,7 @@ version: 1
 # ──────────────────────────────────────────────────────────────
 agents:
   product-manager:
+    model_tier: advanced    # planning / requirements reasoning
     skill: agents/product-manager/SKILL.md
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
@@ -37,6 +38,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml # minimal feature/story stub only
 
   architect:
+    model_tier: advanced    # architecture / system design
     skill: agents/architect/SKILL.md
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
@@ -62,6 +64,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md # signoff role matrix, architecture signoff
 
   backend-developer:
+    model_tier: balanced    # implementation
     skill: agents/backend-developer/SKILL.md
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
@@ -81,6 +84,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/features/**/GETTING-STARTED.md  # key files, seed data, verification steps
 
   frontend-developer:
+    model_tier: balanced    # implementation
     skill: agents/frontend-developer/SKILL.md
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
@@ -96,6 +100,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/features/**/GETTING-STARTED.md  # key files, verification steps
 
   ai-engineer:
+    model_tier: balanced    # implementation
     skill: agents/ai-engineer/SKILL.md
     condition: scope includes AI, LLM, MCP, or {PRODUCT_ROOT}/neuron/
     reads:
@@ -110,6 +115,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/features/**/GETTING-STARTED.md  # key files, verification steps
 
   quality-engineer:
+    model_tier: balanced    # implementation / test authoring
     skill: agents/quality-engineer/SKILL.md
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
@@ -129,6 +135,7 @@ agents:
       # also: test infrastructure configs, coverage reports, CI test pipelines
 
   devops:
+    model_tier: balanced    # implementation / ops wiring
     skill: agents/devops/SKILL.md
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
@@ -150,6 +157,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md # deployability evidence
 
   code-reviewer:
+    model_tier: advanced    # review / correctness reasoning
     skill: agents/code-reviewer/SKILL.md
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
@@ -165,6 +173,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md # code review signoff provenance
 
   security:
+    model_tier: advanced    # security review / threat reasoning
     skill: agents/security/SKILL.md
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
@@ -181,6 +190,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md # security signoff provenance
 
   technical-writer:
+    model_tier: balanced    # documentation authoring
     skill: agents/technical-writer/SKILL.md
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
@@ -194,6 +204,7 @@ agents:
       - "*/README.md"
 
   blogger:
+    model_tier: lightweight    # marketing/blog content generation
     skill: agents/blogger/SKILL.md
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
@@ -261,6 +272,7 @@ actions:
     doc: agents/actions/plan-review.md
     description: Independently review completed planning and decide whether it is ready to build
     prerequisites: [plan action completed for target scope]
+    min_orchestration: [sequential]   # parallel below is an optimization; sequential is the LCD fallback
     steps:
       - parallel:
           - product-manager
@@ -275,6 +287,7 @@ actions:
     doc: agents/actions/build.md
     description: Implement all planned features with review, signoff, PM closeout, and tracker sync gates
     prerequisites: [plan action completed, SOLUTION-PATTERNS.md exists]
+    min_orchestration: [sequential]   # parallel below is an optimization; sequential is the LCD fallback
     steps:
       - agent: architect
         role: assembly-planning
@@ -286,9 +299,11 @@ actions:
           - ai-engineer              # conditional — see agent definition
           - quality-engineer
           - devops
+        execution: {isolation: fresh, parallel_group: build-impl, returns: summary}
       - gate: self-review
         name: implementation-validation
       - agent: code-reviewer
+        execution: {isolation: fresh, parallel_group: null, returns: summary}
       - gate: approval
         name: code-review
       - agent: security
@@ -305,6 +320,7 @@ actions:
     doc: agents/actions/feature.md
     description: Build single vertical slice with review, signoff, PM closeout, and tracker sync
     prerequisites: [plan action completed for this feature, SOLUTION-PATTERNS.md exists]
+    min_orchestration: [sequential]   # parallel below is an optimization; sequential is the LCD fallback
     steps:
       - agent: architect
         role: feature-assembly-planning
@@ -334,6 +350,7 @@ actions:
     doc: agents/actions/feature-review.md
     description: Independently review a completed feature and decide whether it is truly done
     prerequisites: [feature action reached G6 or G8, changed-file set available]
+    min_orchestration: [sequential]   # parallel below is an optimization; sequential is the LCD fallback
     steps:
       - parallel:
           - product-manager
@@ -351,6 +368,7 @@ actions:
     doc: agents/actions/review.md
     description: Code quality + security review with approval gate
     prerequisites: [implementation completed, tests passing]
+    min_orchestration: [sequential]   # parallel below is an optimization; sequential is the LCD fallback
     steps:
       - parallel:
           - code-reviewer
@@ -362,6 +380,7 @@ actions:
     doc: agents/actions/validate.md
     description: Requirements + architecture alignment check (read-only)
     prerequisites: [{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md exists]
+    min_orchestration: [sequential]   # parallel below is an optimization; sequential is the LCD fallback
     steps:
       - parallel:
           - product-manager

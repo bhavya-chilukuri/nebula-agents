@@ -1,0 +1,52 @@
+# Tracker Governance
+
+**Last Updated:** 2026-06-18
+
+## Authoritative Trackers
+
+| Tracker | Purpose | Required Sync Trigger |
+|---------|---------|-----------------------|
+| `planning-mds/BLUEPRINT.md` | Top-level feature and story planning index. | Feature or story added, moved, retired, completed, or archived. |
+| `planning-mds/features/REGISTRY.md` | Feature ID allocation, status, and folder paths. | Feature created, renamed, status changed, retired, or archived. |
+| `planning-mds/features/ROADMAP.md` | Now / Next / Later delivery sequencing. | Feature priority or delivery order changes. |
+| `planning-mds/features/STORY-INDEX.md` | Strict story-file rollup. | Story file added, renamed, moved, or removed. |
+| `planning-mds/features/F####-*/STATUS.md` | Feature delivery state and signoff provenance. | Story status, required reviewer role, evidence, or closeout changes. |
+
+## Lifecycle Rules
+
+- A feature starts as `Planned` or `Draft`, moves to `In Progress` only when implementation starts, and moves to `Done` only after required story signoff provenance is recorded.
+- `Archived` is a post-closeout state. Archived features move under `planning-mds/features/archive/`.
+- Story IDs are never reused inside a feature.
+- Feature IDs are never reused across active, planned, retired, or archived records.
+- F0001 is the first executable terminal UI path. F0002 is a future-state platform path and must preserve a fallback to F0001 behavior until parity is proven.
+
+## Required Signoff Roles
+
+All completed features require:
+
+| Role | Required By Default | Notes |
+|------|---------------------|-------|
+| Quality Engineer | Yes | Acceptance criteria and regression evidence. |
+| Code Reviewer | Yes | Implementation quality, maintainability, and defect review. |
+| Security Reviewer | Conditional | Required for auth, secrets, transcript, provider-token, or permission-boundary changes. |
+| DevOps | Conditional | Required for CI, install, runtime, or environment-contract changes. |
+| Architect | Conditional | Required for platform boundaries, orchestration model, or provider abstraction changes. |
+
+## Evidence Boundary
+
+- Evidence must reference solution artifacts under this repo, product planning docs, test reports, or operation evidence packages.
+- Evidence must not cite `agents/**` guidance files as proof of delivered behavior.
+- Terminal transcript evidence must redact secrets, tokens, account identifiers that are not needed for review, and provider auth cache details.
+
+## Required Validation Commands
+
+Use explicit product-root arguments when running validators from this repo:
+
+```bash
+python agents/product-manager/scripts/validate-stories.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents planning-mds/features
+python agents/product-manager/scripts/validate-trackers.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --skip-feature-evidence
+```
+
+## Orphaned Story Rule
+
+A story file is orphaned when it exists under `planning-mds/features` but is missing from `STORY-INDEX.md`, `BLUEPRINT.md`, or the parent feature `STATUS.md`. Orphaned stories are blocking until either linked into the feature scope or retired with a written reason.
